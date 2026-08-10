@@ -1,29 +1,12 @@
 import { z } from "zod";
+import { decimalString, optionalDecimalString } from "./decimal";
 
 // docs/Product Requirements Document.md section 11 — name, unit, price required.
 // docs/API Specification.md section 65 — money fields travel as decimal strings to
 // avoid JS floating-point precision issues; the raw string is passed through to
-// Prisma's Decimal columns untouched. Range checks use parseFloat only for bounds,
-// never to reconstruct the stored value.
-const DECIMAL_PATTERN = /^\d+(\.\d{1,2})?$/;
-
-const priceString = z
-  .string()
-  .trim()
-  .regex(DECIMAL_PATTERN, "Enter a valid amount with up to 2 decimal places")
-  .refine((value) => parseFloat(value) >= 0, "Price must be 0 or greater");
-
-const taxRateString = z
-  .string()
-  .trim()
-  .regex(DECIMAL_PATTERN, "Enter a valid percentage with up to 2 decimal places")
-  .refine((value) => {
-    const num = parseFloat(value);
-    return num >= 0 && num <= 100;
-  }, "Tax rate must be between 0 and 100")
-  .optional()
-  .or(z.literal(""))
-  .transform((value) => (value ? value : "0.00"));
+// Prisma's Decimal columns untouched.
+const priceString = decimalString({ label: "Price", min: 0 });
+const taxRateString = optionalDecimalString({ label: "Tax rate", min: 0, max: 100, defaultValue: "0.00" });
 
 const optionalString = (max: number) =>
   z
