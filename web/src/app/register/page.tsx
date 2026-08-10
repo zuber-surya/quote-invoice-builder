@@ -39,7 +39,8 @@ export default function RegisterPage() {
       return;
     }
 
-    router.push("/dashboard");
+    // PRD core flow: Register → Business Profile Setup → Dashboard.
+    router.push("/business-profile");
     router.refresh();
   }
 
