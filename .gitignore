@@ -43,6 +43,7 @@ web/prisma/migrations/dev/
 .vscode/*
 !.vscode/extensions.json
 .idea/
+.claude/settings.local.json
 
 # flutter / dart
 mobile/.dart_tool/
