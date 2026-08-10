@@ -14,4 +14,9 @@ describe("formatDecimal", () => {
   it("rounds to 2 decimal places", () => {
     expect(formatDecimal("10.005")).toBe("10.01");
   });
+
+  it("supports a custom decimal place count for quantity columns", () => {
+    expect(formatDecimal("2.5", 3)).toBe("2.500");
+    expect(formatDecimal("10", 3)).toBe("10.000");
+  });
 });
