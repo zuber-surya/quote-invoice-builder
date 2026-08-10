@@ -25,9 +25,14 @@ export default async function DashboardPage() {
       <p className="mt-2 text-sm text-zinc-500">
         Dashboard content (summary cards, recent quotes/invoices) is not built yet.
       </p>
-      <Link href="/customers" className="mt-4 w-fit text-sm font-medium text-zinc-900 underline">
-        Manage Customers
-      </Link>
+      <div className="mt-4 flex w-fit gap-4">
+        <Link href="/customers" className="text-sm font-medium text-zinc-900 underline">
+          Manage Customers
+        </Link>
+        <Link href="/products" className="text-sm font-medium text-zinc-900 underline">
+          Manage Products
+        </Link>
+      </div>
     </div>
   );
 }
