@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
@@ -24,6 +25,9 @@ export default async function DashboardPage() {
       <p className="mt-2 text-sm text-zinc-500">
         Dashboard content (summary cards, recent quotes/invoices) is not built yet.
       </p>
+      <Link href="/customers" className="mt-4 w-fit text-sm font-medium text-zinc-900 underline">
+        Manage Customers
+      </Link>
     </div>
   );
 }
