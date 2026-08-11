@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 // docs/UI-UX Specification.md section 34 — only valid actions are shown for the
-// current status. Download PDF / Convert to Invoice aren't implemented yet
-// (Sprints 8-9), so they're omitted rather than shown as dead buttons.
+// current status. Convert to Invoice isn't implemented yet (Sprint 9), so it's
+// omitted rather than shown as a dead button.
 export function QuoteStatusActions({ quoteId, status }: { quoteId: string; status: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
@@ -73,6 +73,9 @@ export function QuoteStatusActions({ quoteId, status }: { quoteId: string; statu
 
         {status === "SENT" && (
           <>
+            <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={buttonClass}>
+              Download PDF
+            </a>
             <button type="button" disabled={busy} onClick={() => changeStatus("REJECTED")} className={buttonClass}>
               Mark Rejected
             </button>
@@ -80,6 +83,12 @@ export function QuoteStatusActions({ quoteId, status }: { quoteId: string; statu
               Mark Accepted
             </button>
           </>
+        )}
+
+        {(status === "ACCEPTED" || status === "REJECTED" || status === "EXPIRED") && (
+          <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={primaryClass}>
+            Download PDF
+          </a>
         )}
       </div>
 
@@ -94,8 +103,8 @@ export function QuoteStatusActions({ quoteId, status }: { quoteId: string; statu
         </button>
       )}
 
-      {(status === "ACCEPTED" || status === "REJECTED" || status === "EXPIRED") && (
-        <p className="text-sm text-zinc-500">PDF generation and invoice conversion are coming in a later update.</p>
+      {status === "ACCEPTED" && (
+        <p className="text-sm text-zinc-500">Invoice conversion is coming in a later update.</p>
       )}
 
       {error && (
