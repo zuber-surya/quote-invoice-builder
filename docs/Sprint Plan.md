@@ -40,8 +40,8 @@ API is stable. Not part of this milestone's sprints.
 | 9a | Invoice API + Quote → Invoice Conversion | ✅ Done (PR #43) |
 | 9b | Invoice UI (list, create, detail) | ✅ Done (PR #48) |
 | 9c | Invoice PDF | ✅ Done (PR #53) |
-| 10 | **Payments (record payment, status derivation)** | 🔵 Next |
-| 11 | Dashboard (summary cards, recent documents) | ⬜ Not started |
+| 10 | Payments (record payment, status derivation) | ✅ Done (PR #57) |
+| 11 | **Dashboard (summary cards, recent documents)** | 🔵 Next |
 | 12 | Responsive Polish (desktop/tablet/mobile web) | ⬜ Not started |
 | 13 | QA pass + Deployment prep | ⬜ Not started |
 | — | Integration/E2E test infrastructure (backlog, unscheduled) | ⬜ Backlog |
@@ -149,9 +149,30 @@ Full task breakdown tracked as GitHub issues under milestone "Sprint 10: Payment
 history table — this is a fixed V1 simplification (see DB Design), not something to work
 around with an ad-hoc history mechanism.
 
+---
+
+## Sprint 11 (current): Dashboard
+
+**Goal**: summary cards + recent documents on the (currently placeholder) dashboard,
+fully tested.
+
+**Docs to read first**: PRD dashboard section; API Spec §54–56; UI-UX Spec dashboard
+mockups.
+
+Full task breakdown tracked as GitHub issues under milestone "Sprint 11: Dashboard"
+(issues #58–#60):
+
+1. `GET /api/v1/dashboard` — `totalQuotes`, `totalInvoices`, `paidAmount`,
+   `outstandingAmount` (all ownership-scoped), `recentQuotes`/`recentInvoices` (5 each,
+   never the full history per API Spec §56).
+2. Route tests: ownership isolation, correct sums across multiple invoices at different
+   payment states, zero-data empty case.
+3. Dashboard UI — greeting, primary "Create Quote" action, four summary cards, Recent
+   Quotes list, Recent Invoices list. Replaces the current placeholder in
+   `app/dashboard/page.tsx`.
+
 ## Later Sprints (scope only, not yet broken into tasks)
 
-- **Sprint 11 — Dashboard**: summary cards + recent quotes/invoices (API Spec §54–56).
 - **Sprint 12 — Responsive Polish**: PRD §25 breakpoints, table→card transforms on mobile.
   Also the natural point to adopt shadcn/ui (Architecture Decisions ADR-2) since this
   sprint is already touching every screen's accessibility/responsive behavior.
