@@ -34,18 +34,19 @@ API is stable. Not part of this milestone's sprints.
 | 3 | Business Profile | ✅ Done |
 | 4 | Customers (CRUD, search, ownership) | ✅ Done |
 | 5 | Products / Services (CRUD, search) | ✅ Done |
-| 6 | **Quotes — Calculation Engine & API** | 🔵 Next |
-| 7 | Quotes — UI (list, create/edit, detail, status) | ⬜ Not started |
-| 8 | Quotes — PDF generation | ⬜ Not started |
-| 9 | Invoices + Quote → Invoice Conversion | ⬜ Not started |
+| 6 | Quotes — Calculation Engine & API | ✅ Done |
+| 7 | Quotes — UI (list, create/edit, detail, status) | ✅ Done |
+| 8 | Quotes — PDF generation | ✅ Done (PR #30, unmerged as of this writing) |
+| 9 | **Invoices + Quote → Invoice Conversion** | 🔵 Next |
 | 10 | Payments (record payment, status derivation) | ⬜ Not started |
 | 11 | Dashboard (summary cards, recent documents) | ⬜ Not started |
 | 12 | Responsive Polish (desktop/tablet/mobile web) | ⬜ Not started |
 | 13 | QA pass + Deployment prep | ⬜ Not started |
+| — | Integration/E2E test infrastructure (backlog, unscheduled) | ⬜ Backlog |
 
 ---
 
-## Sprint 6 (current): Quotes — Calculation Engine & API
+## Sprint 6 (done): Quotes — Calculation Engine & API
 
 **Goal**: server-authoritative quote calculation and CRUD API, fully tested. No UI, no PDF
 yet — those are Sprints 7–8.
@@ -98,16 +99,23 @@ Spec §29–38, §61–63, §75–76.
 
 ## Later Sprints (scope only, not yet broken into tasks)
 
-- **Sprint 7 — Quotes UI**: list/search/filter, create/edit form with dynamic line items
-  and live client-side preview (server remains authoritative), detail page, status change
-  controls. Mirror `app/products/` and `app/customers/` patterns.
-- **Sprint 8 — Quote PDF**: `GET /api/v1/quotes/:id/pdf`. Needs a PDF library decision
-  (CLAUDE.md rule 15 — new dependency needs justification) before implementation.
 - **Sprint 9 — Invoices + Conversion**: Invoice CRUD (same shape as Quotes), quote→invoice
   transactional conversion (DB Design §24, API Spec §41–42), Invoice PDF.
 - **Sprint 10 — Payments**: `POST /api/v1/invoices/:id/payment`, status derivation
   (`UNPAID`/`PARTIALLY_PAID`/`PAID`), payment validation (API Spec §50–52).
 - **Sprint 11 — Dashboard**: summary cards + recent quotes/invoices (API Spec §54–56).
 - **Sprint 12 — Responsive Polish**: PRD §25 breakpoints, table→card transforms on mobile.
+  Also the natural point to adopt shadcn/ui (Architecture Decisions ADR-2) since this
+  sprint is already touching every screen's accessibility/responsive behavior.
 - **Sprint 13 — QA & Deployment prep**: Testing & QA Spec, Deployment & Infrastructure
   Spec — full pass before considering V1 shippable.
+
+## Backlog (unscheduled)
+
+- **Integration/E2E test infrastructure** — test Postgres database config (separate from
+  dev DB, per Testing & QA Spec §7), Playwright setup for the critical E2E flow (§61,
+  Register → Quote → PDF → Invoice → Payment → Paid), fixture/factory functions
+  (`createTestUser()`, `createTestCustomer()`, etc. per §8-9). Currently only 110 unit
+  tests exist (mocked Prisma/auth). See Architecture Decisions ADR-6. Not assigned to a
+  sprint number yet — schedule explicitly when picked up, rather than folding into a
+  feature sprint.

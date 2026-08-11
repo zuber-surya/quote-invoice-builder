@@ -38,6 +38,17 @@ resolve in this order: Business Requirement (PRD) → System Requirement → Arc
 API/Database → UI/UX → Implementation. If an implementation would conflict with a
 higher-level requirement, raise it — do not silently change the requirement.
 
+## Known Deviations From the Standards
+
+`docs/Web Development Standards.md` and `docs/Testing & QA Specification.md` are
+mandatory, but a few things are knowingly not (yet) followed — see
+`docs/Architecture Decisions.md` for the full rationale and when to revisit each one:
+no Service/Repository layers (routes call Prisma directly), shadcn/ui not adopted (plain
+Tailwind), no centralized `lib/api/` client, on-demand PDF generation (no object
+storage), no integration/E2E test infrastructure yet (unit tests with mocked
+Prisma/auth only). Don't silently "fix" these mid-feature — they're tracked decisions,
+not bugs.
+
 ## Important Rules
 
 1. Read relevant documentation before implementing features.
@@ -91,6 +102,13 @@ Quote/invoice line items snapshot product data (name, description, unit, price, 
 rate) at creation time. They do not live-reference products — historical documents must
 not change when product data changes later.
 
+## Naming Conventions
+
+Component/utility files use **kebab-case** (`customer-form.tsx`, `format-decimal.ts`),
+not the PascalCase suggested in Web Development Standards §80 — see
+`docs/Architecture Decisions.md` ADR-4. This is the project's adopted convention, not
+debt; don't rename existing files to match the doc.
+
 ## Git
 
 Use conventional commits: `feat:` `fix:` `refactor:` `test:` `docs:` `chore:` `build:` `ci:`
@@ -100,6 +118,10 @@ increments over large multi-feature commits.
 
 Branch strategy: `main` is always stable. Feature work happens on `feature/*` branches
 (e.g. `feature/customers`, `feature/quotes`) merged via PR.
+
+PRs use `.github/pull_request_template.md`. CI (`.github/workflows/ci.yml` — install,
+lint, typecheck, unit tests, build) must pass before merge; it does not yet run
+integration/E2E tests (see Architecture Decisions ADR-6).
 
 ## Forbidden
 
