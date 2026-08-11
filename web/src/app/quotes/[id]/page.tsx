@@ -16,6 +16,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
     include: {
       items: { orderBy: { sortOrder: "asc" } },
       customer: { select: { id: true, name: true, companyName: true, email: true } },
+      invoice: { select: { id: true } },
     },
   });
   if (!quote) notFound();
@@ -30,7 +31,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           </div>
           <p className="mt-1 text-sm text-zinc-500">{quote.customer.name}</p>
         </div>
-        <QuoteStatusActions quoteId={quote.id} status={quote.status} />
+        <QuoteStatusActions quoteId={quote.id} status={quote.status} invoiceId={quote.invoice?.id ?? null} />
       </div>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">

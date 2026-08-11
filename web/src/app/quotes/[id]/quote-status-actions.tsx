@@ -5,12 +5,35 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 // docs/UI-UX Specification.md section 34 — only valid actions are shown for the
-// current status. Convert to Invoice isn't implemented yet (Sprint 9), so it's
-// omitted rather than shown as a dead button.
-export function QuoteStatusActions({ quoteId, status }: { quoteId: string; status: string }) {
+// current status.
+export function QuoteStatusActions({
+  quoteId,
+  status,
+  invoiceId,
+}: {
+  quoteId: string;
+  status: string;
+  invoiceId: string | null;
+}) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  async function handleConvert() {
+    setBusy(true);
+    setError(null);
+
+    const response = await fetch(`/api/v1/quotes/${quoteId}/convert-to-invoice`, { method: "POST" });
+    const result = await response.json().catch(() => null);
+    setBusy(false);
+
+    if (!response.ok || !result?.success) {
+      setError(result?.error?.message ?? "Unable to convert quote to invoice. Please try again.");
+      return;
+    }
+    router.push(`/invoices/${result.data.id}`);
+    router.refresh();
+  }
 
   async function changeStatus(nextStatus: string) {
     setBusy(true);
@@ -85,10 +108,27 @@ export function QuoteStatusActions({ quoteId, status }: { quoteId: string; statu
           </>
         )}
 
-        {(status === "ACCEPTED" || status === "REJECTED" || status === "EXPIRED") && (
+        {(status === "REJECTED" || status === "EXPIRED") && (
           <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={primaryClass}>
             Download PDF
           </a>
+        )}
+
+        {status === "ACCEPTED" && (
+          <>
+            <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={buttonClass}>
+              Download PDF
+            </a>
+            {invoiceId ? (
+              <Link href={`/invoices/${invoiceId}`} className={primaryClass}>
+                View Invoice
+              </Link>
+            ) : (
+              <button type="button" disabled={busy} onClick={handleConvert} className={primaryClass}>
+                Convert to Invoice
+              </button>
+            )}
+          </>
         )}
       </div>
 
@@ -101,10 +141,6 @@ export function QuoteStatusActions({ quoteId, status }: { quoteId: string; statu
         >
           Mark as expired
         </button>
-      )}
-
-      {status === "ACCEPTED" && (
-        <p className="text-sm text-zinc-500">Invoice conversion is coming in a later update.</p>
       )}
 
       {error && (
