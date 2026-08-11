@@ -1,53 +1,68 @@
 import { notFound, redirect } from "next/navigation";
+import Link from "next/link";
 import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { formatDecimal } from "@/lib/format-decimal";
-import { QuoteStatusBadge } from "../quote-status-badge";
-import { QuoteStatusActions } from "./quote-status-actions";
+import { InvoiceStatusBadge } from "../invoice-status-badge";
+import { InvoiceStatusActions } from "./invoice-status-actions";
 
-// docs/UI-UX Specification.md section 33.
-export default async function QuoteDetailPage({ params }: { params: Promise<{ id: string }> }) {
+// Mirrors quotes/[id]/page.tsx.
+export default async function InvoiceDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
   if (!user) redirect("/login");
 
   const { id } = await params;
-  const quote = await prisma.quote.findFirst({
+  const invoice = await prisma.invoice.findFirst({
     where: { id, userId: user.id },
     include: {
       items: { orderBy: { sortOrder: "asc" } },
       customer: { select: { id: true, name: true, companyName: true, email: true } },
-      invoice: { select: { id: true } },
+      quote: { select: { id: true, quoteNumber: true } },
     },
   });
-  if (!quote) notFound();
+  if (!invoice) notFound();
+
+  const remainingAmount = Number(invoice.totalAmount) - Number(invoice.paidAmount);
 
   return (
     <div className="flex flex-1 flex-col gap-6 p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold text-zinc-900">{quote.quoteNumber}</h1>
-            <QuoteStatusBadge status={quote.status} />
+            <h1 className="text-xl font-semibold text-zinc-900">{invoice.invoiceNumber}</h1>
+            <InvoiceStatusBadge status={invoice.status} />
           </div>
-          <p className="mt-1 text-sm text-zinc-500">{quote.customer.name}</p>
+          <p className="mt-1 text-sm text-zinc-500">{invoice.customer.name}</p>
+          {invoice.quote && (
+            <p className="mt-1 text-xs text-zinc-500">
+              Converted from quote{" "}
+              <Link href={`/quotes/${invoice.quote.id}`} className="underline">
+                {invoice.quote.quoteNumber}
+              </Link>
+            </p>
+          )}
         </div>
-        <QuoteStatusActions quoteId={quote.id} status={quote.status} invoiceId={quote.invoice?.id ?? null} />
+        <InvoiceStatusActions invoiceId={invoice.id} status={invoice.status} />
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-xs font-medium uppercase text-zinc-500">Quote Date</p>
-          <p className="mt-1 text-sm text-zinc-900">{quote.quoteDate.toISOString().slice(0, 10)}</p>
+          <p className="text-xs font-medium uppercase text-zinc-500">Invoice Date</p>
+          <p className="mt-1 text-sm text-zinc-900">{invoice.invoiceDate.toISOString().slice(0, 10)}</p>
         </div>
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
-          <p className="text-xs font-medium uppercase text-zinc-500">Valid Until</p>
+          <p className="text-xs font-medium uppercase text-zinc-500">Due Date</p>
           <p className="mt-1 text-sm text-zinc-900">
-            {quote.expiryDate ? quote.expiryDate.toISOString().slice(0, 10) : "—"}
+            {invoice.dueDate ? invoice.dueDate.toISOString().slice(0, 10) : "—"}
           </p>
         </div>
         <div className="rounded-lg border border-zinc-200 bg-white p-4">
           <p className="text-xs font-medium uppercase text-zinc-500">Total</p>
-          <p className="mt-1 text-sm font-semibold text-zinc-900">{formatDecimal(quote.totalAmount)}</p>
+          <p className="mt-1 text-sm font-semibold text-zinc-900">{formatDecimal(invoice.totalAmount)}</p>
+        </div>
+        <div className="rounded-lg border border-zinc-200 bg-white p-4">
+          <p className="text-xs font-medium uppercase text-zinc-500">Remaining</p>
+          <p className="mt-1 text-sm font-semibold text-zinc-900">{remainingAmount.toFixed(2)}</p>
         </div>
       </div>
 
@@ -64,7 +79,7 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
             </tr>
           </thead>
           <tbody className="divide-y divide-zinc-100">
-            {quote.items.map((item) => (
+            {invoice.items.map((item) => (
               <tr key={item.id}>
                 <td className="px-4 py-3">
                   <p className="font-medium text-zinc-900">{item.name}</p>
@@ -87,35 +102,43 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         <dl className="flex w-full max-w-xs flex-col gap-2 text-sm sm:w-72">
           <div className="flex justify-between">
             <dt className="text-zinc-500">Subtotal</dt>
-            <dd className="text-zinc-900">{formatDecimal(quote.subtotal)}</dd>
+            <dd className="text-zinc-900">{formatDecimal(invoice.subtotal)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-zinc-500">Discount</dt>
-            <dd className="text-zinc-900">{formatDecimal(quote.discountAmount)}</dd>
+            <dd className="text-zinc-900">{formatDecimal(invoice.discountAmount)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-zinc-500">Tax</dt>
-            <dd className="text-zinc-900">{formatDecimal(quote.taxAmount)}</dd>
+            <dd className="text-zinc-900">{formatDecimal(invoice.taxAmount)}</dd>
           </div>
           <div className="flex justify-between border-t border-zinc-200 pt-2 font-semibold">
             <dt className="text-zinc-900">Total</dt>
-            <dd className="text-zinc-900">{formatDecimal(quote.totalAmount)}</dd>
+            <dd className="text-zinc-900">{formatDecimal(invoice.totalAmount)}</dd>
+          </div>
+          <div className="flex justify-between">
+            <dt className="text-zinc-500">Paid</dt>
+            <dd className="text-zinc-900">{formatDecimal(invoice.paidAmount)}</dd>
+          </div>
+          <div className="flex justify-between font-semibold">
+            <dt className="text-zinc-900">Remaining</dt>
+            <dd className="text-zinc-900">{remainingAmount.toFixed(2)}</dd>
           </div>
         </dl>
       </div>
 
-      {(quote.notes || quote.terms) && (
+      {(invoice.notes || invoice.terms) && (
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-          {quote.notes && (
+          {invoice.notes && (
             <div className="rounded-lg border border-zinc-200 bg-white p-4">
               <p className="text-xs font-medium uppercase text-zinc-500">Notes</p>
-              <p className="mt-1 text-sm text-zinc-900">{quote.notes}</p>
+              <p className="mt-1 text-sm text-zinc-900">{invoice.notes}</p>
             </div>
           )}
-          {quote.terms && (
+          {invoice.terms && (
             <div className="rounded-lg border border-zinc-200 bg-white p-4">
               <p className="text-xs font-medium uppercase text-zinc-500">Terms</p>
-              <p className="mt-1 text-sm text-zinc-900">{quote.terms}</p>
+              <p className="mt-1 text-sm text-zinc-900">{invoice.terms}</p>
             </div>
           )}
         </div>

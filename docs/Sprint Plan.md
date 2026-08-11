@@ -37,8 +37,8 @@ API is stable. Not part of this milestone's sprints.
 | 6 | Quotes — Calculation Engine & API | ✅ Done |
 | 7 | Quotes — UI (list, create/edit, detail, status) | ✅ Done |
 | 8 | Quotes — PDF generation | ✅ Done (PR #30, unmerged as of this writing) |
-| 9a | **Invoice API + Quote → Invoice Conversion** | 🔵 Next |
-| 9b | Invoice UI (list, create, detail) | ⬜ Not started |
+| 9a | Invoice API + Quote → Invoice Conversion | ✅ Done (PR #43) |
+| 9b | **Invoice UI (list, create, detail)** | 🔵 Next |
 | 9c | Invoice PDF | ⬜ Not started |
 | 10 | Payments (record payment, status derivation) | ⬜ Not started |
 | 11 | Dashboard (summary cards, recent documents) | ⬜ Not started |
@@ -99,7 +99,7 @@ Spec §29–38, §61–63, §75–76.
 
 ---
 
-## Sprint 9a (current): Invoice API + Quote → Invoice Conversion
+## Sprint 9a (done): Invoice API + Quote → Invoice Conversion
 
 **Goal**: Invoice CRUD API (same shape as Quotes) + quote→invoice transactional
 conversion, fully tested. No UI, no PDF yet — those are Sprints 9b–9c.

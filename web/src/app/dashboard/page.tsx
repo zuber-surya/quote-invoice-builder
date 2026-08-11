@@ -35,6 +35,9 @@ export default async function DashboardPage() {
         <Link href="/quotes" className="text-sm font-medium text-zinc-900 underline">
           Manage Quotes
         </Link>
+        <Link href="/invoices" className="text-sm font-medium text-zinc-900 underline">
+          Manage Invoices
+        </Link>
       </div>
     </div>
   );
