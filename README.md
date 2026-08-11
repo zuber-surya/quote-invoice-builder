@@ -36,22 +36,30 @@ Read the relevant doc before implementing a feature. See `CLAUDE.md` for the ful
 
 ## Status
 
-Pre-MVP, foundation phase. Current state:
+MVP in progress, Sprint 8 of 13 complete. Current state:
 
 - [x] Repository structure, `CLAUDE.md`, docs
 - [x] Next.js + TypeScript + Tailwind scaffold (`web/`)
 - [x] Prisma schema for all V1 domain tables
 - [x] Auth.js credentials login/register (JWT sessions) + protected routes
 - [x] `/api/health` check
-- [ ] Business Profile
-- [ ] Customers
-- [ ] Products/Services
-- [ ] Quotes (+ PDF)
+- [x] Business Profile
+- [x] Customers (CRUD, search, ownership isolation)
+- [x] Products/Services (CRUD, search)
+- [x] Quotes — calculation engine, CRUD API, list/create/edit/detail UI, status
+      transitions (merged)
+- [x] Quotes — PDF generation (PR #30, unmerged as of this writing)
 - [ ] Invoices (+ quote→invoice conversion, PDF)
 - [ ] Payments / dashboard
 - [ ] Responsive polish
 - [ ] Flutter mobile app
-- [ ] CI/CD, deployment
+- [x] CI (`.github/workflows/ci.yml` — install/lint/typecheck/unit test/build)
+- [ ] Deployment
+- [ ] Integration/E2E test infrastructure (tracked as a backlog item in
+      `docs/Sprint Plan.md` — see `docs/Architecture Decisions.md` ADR-6)
+
+See `docs/Sprint Plan.md` for the full sprint breakdown and
+`docs/Architecture Decisions.md` for deliberate deviations from the standards docs.
 
 ## Local Development
 
