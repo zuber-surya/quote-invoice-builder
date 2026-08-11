@@ -39,8 +39,8 @@ API is stable. Not part of this milestone's sprints.
 | 8 | Quotes — PDF generation | ✅ Done (PR #30) |
 | 9a | Invoice API + Quote → Invoice Conversion | ✅ Done (PR #43) |
 | 9b | Invoice UI (list, create, detail) | ✅ Done (PR #48) |
-| 9c | **Invoice PDF** | 🔵 Next |
-| 10 | Payments (record payment, status derivation) | ⬜ Not started |
+| 9c | Invoice PDF | ✅ Done (PR #53) |
+| 10 | **Payments (record payment, status derivation)** | 🔵 Next |
 | 11 | Dashboard (summary cards, recent documents) | ⬜ Not started |
 | 12 | Responsive Polish (desktop/tablet/mobile web) | ⬜ Not started |
 | 13 | QA pass + Deployment prep | ⬜ Not started |
@@ -123,15 +123,34 @@ Quote-to-Invoice Conversion" (issues #32–#42):
 
 **Explicitly not in this sprint**: invoice UI, invoice PDF, payment recording (Sprint 10).
 
+---
+
+## Sprint 10 (current): Payments
+
+**Goal**: record payments against an invoice, with server-derived status
+(`UNPAID`/`PARTIALLY_PAID`/`PAID`), fully tested.
+
+**Docs to read first**: PRD §22; API Spec §50–52; Code & Development Workflow §39
+("test concurrent payments").
+
+Full task breakdown tracked as GitHub issues under milestone "Sprint 10: Payments"
+(issues #54–#56):
+
+1. `POST /api/v1/invoices/:id/payment` — validate `amount > 0` and
+   `paidAmount + amount <= totalAmount`, reject on an already-`PAID` or `DRAFT` invoice,
+   optimistic-concurrency update to prevent an overpayment race, derive status
+   (`PARTIALLY_PAID` vs `PAID`, set `paidDate` when fully paid).
+2. Route tests: validation, already-paid rejection, status derivation, concurrent-payment
+   race (mirrors the quote-number/conversion race tests from Sprints 6 and 9a).
+3. Record Payment form on the invoice detail page, replacing today's "coming in a later
+   update" placeholder for `UNPAID`/`PARTIALLY_PAID` invoices.
+
+**Note**: the schema has a single `paymentNotes` field on `Invoice`, not a payment
+history table — this is a fixed V1 simplification (see DB Design), not something to work
+around with an ad-hoc history mechanism.
+
 ## Later Sprints (scope only, not yet broken into tasks)
 
-- **Sprint 9b — Invoice UI**: list/search/filter, create form (mirror quote-form.tsx),
-  detail page. Also adds a "Convert to Invoice" action on the quote detail page for
-  `ACCEPTED` quotes (replacing today's "coming in a later update" placeholder).
-- **Sprint 9c — Invoice PDF**: mirrors `lib/pdf/quote-pdf-document.tsx`, adds payment
-  status/paid/remaining fields per PRD §23.
-- **Sprint 10 — Payments**: `POST /api/v1/invoices/:id/payment`, status derivation
-  (`UNPAID`/`PARTIALLY_PAID`/`PAID`), payment validation (API Spec §50–52).
 - **Sprint 11 — Dashboard**: summary cards + recent quotes/invoices (API Spec §54–56).
 - **Sprint 12 — Responsive Polish**: PRD §25 breakpoints, table→card transforms on mobile.
   Also the natural point to adopt shadcn/ui (Architecture Decisions ADR-2) since this
