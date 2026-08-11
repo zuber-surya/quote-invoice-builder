@@ -2,39 +2,43 @@ import { Prisma } from "@prisma/client";
 import { prisma } from "@/lib/prisma";
 import { getCurrentUser } from "@/lib/get-current-user";
 import { apiSuccess, apiUnauthorized, apiValidationError, apiInternalError } from "@/lib/api-response";
-import { quoteSchema, quoteListQuerySchema } from "@/lib/validations/quote";
+import { invoiceSchema, invoiceListQuerySchema } from "@/lib/validations/invoice";
 import { calculateDocumentTotals } from "@/lib/document-calculation";
 import { getNextDocumentNumber, UNIQUE_CONSTRAINT_ERROR_CODE } from "@/lib/document-number";
-import { serializeQuote } from "@/lib/serialize-quote";
+import { serializeInvoice } from "@/lib/serialize-invoice";
 import { validateCustomerAndProductReferences } from "@/lib/document-ownership";
 
-// docs/API Specification.md sections 29-30, 32-34.
+// docs/API Specification.md sections 43, 46-47.
 // Ownership: every query is scoped by the authenticated user's id (CLAUDE.md rule 11).
 // Financial totals are always server-calculated (CLAUDE.md rule 10) — the client
 // never supplies subtotal/taxAmount/totalAmount/lineTotal, only the raw item inputs.
+// This is direct invoice creation (not from a quote) — see
+// app/api/v1/quotes/[id]/convert-to-invoice/route.ts for the conversion path.
+
+const CUSTOMER_SELECT = { id: true, name: true, companyName: true, email: true } as const;
 
 export async function GET(request: Request) {
   const user = await getCurrentUser();
   if (!user) return apiUnauthorized();
 
   const { searchParams } = new URL(request.url);
-  const parsed = quoteListQuerySchema.safeParse(Object.fromEntries(searchParams));
+  const parsed = invoiceListQuerySchema.safeParse(Object.fromEntries(searchParams));
   if (!parsed.success) {
     return apiValidationError(parsed.error);
   }
   const { page, pageSize, search, status, customerId, dateFrom, dateTo, sortBy, sortOrder } = parsed.data;
 
-  const where: Prisma.QuoteWhereInput = {
+  const where: Prisma.InvoiceWhereInput = {
     userId: user.id,
     ...(status ? { status } : {}),
     ...(customerId ? { customerId } : {}),
     ...(dateFrom || dateTo
-      ? { quoteDate: { ...(dateFrom ? { gte: new Date(dateFrom) } : {}), ...(dateTo ? { lte: new Date(dateTo) } : {}) } }
+      ? { invoiceDate: { ...(dateFrom ? { gte: new Date(dateFrom) } : {}), ...(dateTo ? { lte: new Date(dateTo) } : {}) } }
       : {}),
     ...(search
       ? {
           OR: [
-            { quoteNumber: { contains: search, mode: "insensitive" } },
+            { invoiceNumber: { contains: search, mode: "insensitive" } },
             { customer: { name: { contains: search, mode: "insensitive" } } },
           ],
         }
@@ -42,35 +46,35 @@ export async function GET(request: Request) {
   };
 
   try {
-    const [quotes, total] = await prisma.$transaction([
-      prisma.quote.findMany({
+    const [invoices, total] = await prisma.$transaction([
+      prisma.invoice.findMany({
         where,
         orderBy: { [sortBy]: sortOrder },
         skip: (page - 1) * pageSize,
         take: pageSize,
-        include: { customer: { select: { id: true, name: true, companyName: true, email: true } } },
+        include: { customer: { select: CUSTOMER_SELECT } },
       }),
-      prisma.quote.count({ where }),
+      prisma.invoice.count({ where }),
     ]);
 
     return apiSuccess(
-      quotes.map((quote) => serializeQuote(quote)),
+      invoices.map((invoice) => serializeInvoice(invoice)),
       { meta: { page, pageSize, total, totalPages: Math.max(1, Math.ceil(total / pageSize)) } }
     );
   } catch (error) {
-    console.error("Failed to list quotes:", error);
+    console.error("Failed to list invoices:", error);
     return apiInternalError();
   }
 }
 
-const MAX_QUOTE_NUMBER_ATTEMPTS = 5;
+const MAX_NUMBER_ATTEMPTS = 5;
 
 export async function POST(request: Request) {
   const user = await getCurrentUser();
   if (!user) return apiUnauthorized();
 
   const body = await request.json().catch(() => null);
-  const parsed = quoteSchema.safeParse(body);
+  const parsed = invoiceSchema.safeParse(body);
   if (!parsed.success) {
     return apiValidationError(parsed.error);
   }
@@ -88,28 +92,29 @@ export async function POST(request: Request) {
     }))
   );
 
-  for (let attempt = 1; attempt <= MAX_QUOTE_NUMBER_ATTEMPTS; attempt++) {
+  for (let attempt = 1; attempt <= MAX_NUMBER_ATTEMPTS; attempt++) {
     try {
-      const quote = await prisma.$transaction(async (tx) => {
-        const last = await tx.quote.findFirst({
+      const invoice = await prisma.$transaction(async (tx) => {
+        const last = await tx.invoice.findFirst({
           where: { userId: user.id },
           orderBy: { createdAt: "desc" },
-          select: { quoteNumber: true },
+          select: { invoiceNumber: true },
         });
-        const quoteNumber = getNextDocumentNumber(last?.quoteNumber ?? null, "Q");
+        const invoiceNumber = getNextDocumentNumber(last?.invoiceNumber ?? null, "INV");
 
-        return tx.quote.create({
+        return tx.invoice.create({
           data: {
             userId: user.id,
             customerId: input.customerId,
-            quoteNumber,
-            quoteDate: new Date(input.quoteDate),
-            expiryDate: input.expiryDate ? new Date(input.expiryDate) : null,
-            status: "DRAFT",
+            invoiceNumber,
+            invoiceDate: new Date(input.invoiceDate),
+            dueDate: input.dueDate ? new Date(input.dueDate) : null,
+            status: "UNPAID",
             subtotal: totals.subtotal,
             discountAmount: totals.discountAmount,
             taxAmount: totals.taxAmount,
             totalAmount: totals.totalAmount,
+            paidAmount: "0.00",
             notes: input.notes,
             terms: input.terms,
             items: {
@@ -128,23 +133,21 @@ export async function POST(request: Request) {
               })),
             },
           },
-          include: { items: true, customer: { select: { id: true, name: true, companyName: true, email: true } } },
+          include: { items: true, customer: { select: CUSTOMER_SELECT } },
         });
       });
 
-      return apiSuccess(serializeQuote(quote), { status: 201 });
+      return apiSuccess(serializeInvoice(invoice), { status: 201 });
     } catch (error) {
-      // The only unique constraint a quote create can hit is (userId, quoteNumber) —
-      // id is an auto-generated uuid. A P2002 here means a concurrent request took
-      // the number we just computed; recompute and retry.
-      const isQuoteNumberConflict =
+      // The only unique constraint an invoice create can hit is (userId, invoiceNumber).
+      const isNumberConflict =
         error instanceof Prisma.PrismaClientKnownRequestError && error.code === UNIQUE_CONSTRAINT_ERROR_CODE;
 
-      if (isQuoteNumberConflict && attempt < MAX_QUOTE_NUMBER_ATTEMPTS) {
+      if (isNumberConflict && attempt < MAX_NUMBER_ATTEMPTS) {
         continue;
       }
 
-      console.error("Failed to create quote:", error);
+      console.error("Failed to create invoice:", error);
       return apiInternalError();
     }
   }

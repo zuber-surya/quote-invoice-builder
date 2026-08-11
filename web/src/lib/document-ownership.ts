@@ -1,11 +1,11 @@
 import { prisma } from "./prisma";
 import { apiError } from "./api-response";
 
-// Shared by POST /api/v1/quotes and PUT /api/v1/quotes/:id — both need to verify
-// the customer and any referenced products belong to the current user before
-// touching quote data. CLAUDE.md rule 11: every query touching business data must
-// filter by the authenticated user's ownership.
-export async function validateQuoteReferences(
+// Shared by POST/PUT for both Quotes and Invoices — every document create/update
+// needs to verify the customer and any referenced products belong to the current
+// user before touching data. CLAUDE.md rule 11: every query touching business data
+// must filter by the authenticated user's ownership.
+export async function validateCustomerAndProductReferences(
   userId: string,
   customerId: string,
   items: { productId?: string | null }[]

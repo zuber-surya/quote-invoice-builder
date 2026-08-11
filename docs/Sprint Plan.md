@@ -37,7 +37,9 @@ API is stable. Not part of this milestone's sprints.
 | 6 | Quotes — Calculation Engine & API | ✅ Done |
 | 7 | Quotes — UI (list, create/edit, detail, status) | ✅ Done |
 | 8 | Quotes — PDF generation | ✅ Done (PR #30, unmerged as of this writing) |
-| 9 | **Invoices + Quote → Invoice Conversion** | 🔵 Next |
+| 9a | **Invoice API + Quote → Invoice Conversion** | 🔵 Next |
+| 9b | Invoice UI (list, create, detail) | ⬜ Not started |
+| 9c | Invoice PDF | ⬜ Not started |
 | 10 | Payments (record payment, status derivation) | ⬜ Not started |
 | 11 | Dashboard (summary cards, recent documents) | ⬜ Not started |
 | 12 | Responsive Polish (desktop/tablet/mobile web) | ⬜ Not started |
@@ -97,10 +99,37 @@ Spec §29–38, §61–63, §75–76.
 
 ---
 
+## Sprint 9a (current): Invoice API + Quote → Invoice Conversion
+
+**Goal**: Invoice CRUD API (same shape as Quotes) + quote→invoice transactional
+conversion, fully tested. No UI, no PDF yet — those are Sprints 9b–9c.
+
+**Docs to read first**: PRD §18–23; DB Design §18–27; API Spec §41–53, §60.
+
+Full task breakdown tracked as GitHub issues under milestone "Sprint 9a: Invoice API +
+Quote-to-Invoice Conversion" (issues #32–#42):
+
+1. Generalize `lib/quote-calculation.ts`/`quote-number.ts`/`quote-ownership.ts` into
+   document-agnostic versions (Web Dev Standards §19 names the target shape,
+   `calculateDocumentTotals()`) — no behavior change, rerun quote tests first.
+2. Extract shared `documentItemSchema` from `lib/validations/quote.ts`.
+3. `lib/validations/invoice.ts`, `lib/serialize-invoice.ts` (adds `remainingAmount`).
+4. `POST`/`GET /api/v1/invoices`, `GET`/`PUT`/`DELETE /api/v1/invoices/:id` — mirror the
+   quotes routes exactly; `PUT`/`DELETE` restricted to `DRAFT`.
+5. `POST /api/v1/quotes/:id/convert-to-invoice` — verify `ACCEPTED` + not already
+   converted, copy customer/items as fresh snapshots, recalculate totals, one
+   transaction.
+6. Route tests: ownership isolation, DRAFT-only enforcement, conversion rejection cases.
+
+**Explicitly not in this sprint**: invoice UI, invoice PDF, payment recording (Sprint 10).
+
 ## Later Sprints (scope only, not yet broken into tasks)
 
-- **Sprint 9 — Invoices + Conversion**: Invoice CRUD (same shape as Quotes), quote→invoice
-  transactional conversion (DB Design §24, API Spec §41–42), Invoice PDF.
+- **Sprint 9b — Invoice UI**: list/search/filter, create form (mirror quote-form.tsx),
+  detail page. Also adds a "Convert to Invoice" action on the quote detail page for
+  `ACCEPTED` quotes (replacing today's "coming in a later update" placeholder).
+- **Sprint 9c — Invoice PDF**: mirrors `lib/pdf/quote-pdf-document.tsx`, adds payment
+  status/paid/remaining fields per PRD §23.
 - **Sprint 10 — Payments**: `POST /api/v1/invoices/:id/payment`, status derivation
   (`UNPAID`/`PARTIALLY_PAID`/`PAID`), payment validation (API Spec §50–52).
 - **Sprint 11 — Dashboard**: summary cards + recent quotes/invoices (API Spec §54–56).

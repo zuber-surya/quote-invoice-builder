@@ -14,30 +14,34 @@ import { Prisma } from "@prisma/client";
 // All monetary intermediate values round to 2 decimal places (NUMERIC(15,2)) at
 // the point they're produced, using Prisma's Decimal (decimal.js) — never
 // floating point (CLAUDE.md "Financial Rules").
+//
+// Shared by Quotes and Invoices — docs/Web Development Standards.md section 19
+// names this exact shape (`calculateDocumentTotals()`), since both documents use
+// the identical calculation model. Do not duplicate this per document type.
 
 const MONEY_DP = 2;
 const roundMoney = (value: Prisma.Decimal) => value.toDecimalPlaces(MONEY_DP, Prisma.Decimal.ROUND_HALF_UP);
 
-export type QuoteItemCalcInput = {
+export type DocumentItemCalcInput = {
   quantity: string;
   unitPrice: string;
   discountAmount: string;
   taxRate: string;
 };
 
-export type QuoteItemCalculated = QuoteItemCalcInput & {
+export type DocumentItemCalculated = DocumentItemCalcInput & {
   taxAmount: string;
   lineTotal: string;
 };
 
-export type QuoteTotals = {
+export type DocumentTotals = {
   subtotal: string;
   discountAmount: string;
   taxAmount: string;
   totalAmount: string;
 };
 
-export function calculateQuoteItem(item: QuoteItemCalcInput): QuoteItemCalculated {
+export function calculateDocumentItem(item: DocumentItemCalcInput): DocumentItemCalculated {
   const quantity = new Prisma.Decimal(item.quantity);
   const unitPrice = new Prisma.Decimal(item.unitPrice);
   const discountAmount = new Prisma.Decimal(item.discountAmount);
@@ -58,13 +62,13 @@ export function calculateQuoteItem(item: QuoteItemCalcInput): QuoteItemCalculate
   };
 }
 
-export function calculateQuoteTotals(items: QuoteItemCalcInput[]): {
-  items: QuoteItemCalculated[];
-  totals: QuoteTotals;
+export function calculateDocumentTotals(items: DocumentItemCalcInput[]): {
+  items: DocumentItemCalculated[];
+  totals: DocumentTotals;
 } {
-  const calculatedItems = items.map(calculateQuoteItem);
+  const calculatedItems = items.map(calculateDocumentItem);
 
-  const gross = (item: QuoteItemCalculated) => new Prisma.Decimal(item.quantity).times(item.unitPrice);
+  const gross = (item: DocumentItemCalculated) => new Prisma.Decimal(item.quantity).times(item.unitPrice);
 
   const subtotal = calculatedItems.reduce(
     (sum, item) => sum.plus(roundMoney(gross(item))),
