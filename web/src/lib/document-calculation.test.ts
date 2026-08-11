@@ -1,9 +1,9 @@
 import { describe, expect, it } from "vitest";
-import { calculateQuoteItem, calculateQuoteTotals } from "./quote-calculation";
+import { calculateDocumentItem, calculateDocumentTotals } from "./document-calculation";
 
-describe("calculateQuoteItem", () => {
+describe("calculateDocumentItem", () => {
   it("matches API Specification section 76 Test 2 exactly", () => {
-    const result = calculateQuoteItem({
+    const result = calculateDocumentItem({
       quantity: "2",
       unitPrice: "10000.00",
       discountAmount: "1000.00",
@@ -15,7 +15,7 @@ describe("calculateQuoteItem", () => {
   });
 
   it("handles zero discount", () => {
-    const result = calculateQuoteItem({
+    const result = calculateDocumentItem({
       quantity: "1",
       unitPrice: "100.00",
       discountAmount: "0.00",
@@ -26,7 +26,7 @@ describe("calculateQuoteItem", () => {
   });
 
   it("handles zero tax", () => {
-    const result = calculateQuoteItem({
+    const result = calculateDocumentItem({
       quantity: "1",
       unitPrice: "100.00",
       discountAmount: "10.00",
@@ -37,7 +37,7 @@ describe("calculateQuoteItem", () => {
   });
 
   it("handles fractional quantities", () => {
-    const result = calculateQuoteItem({
+    const result = calculateDocumentItem({
       quantity: "2.5",
       unitPrice: "100.00",
       discountAmount: "0.00",
@@ -49,7 +49,7 @@ describe("calculateQuoteItem", () => {
   });
 
   it("rounds tax half-up to 2 decimal places", () => {
-    const result = calculateQuoteItem({
+    const result = calculateDocumentItem({
       quantity: "1",
       unitPrice: "10.005",
       discountAmount: "0.00",
@@ -60,9 +60,9 @@ describe("calculateQuoteItem", () => {
   });
 });
 
-describe("calculateQuoteTotals", () => {
+describe("calculateDocumentTotals", () => {
   it("sums a single item to match its own totals", () => {
-    const { totals } = calculateQuoteTotals([
+    const { totals } = calculateDocumentTotals([
       { quantity: "2", unitPrice: "10000.00", discountAmount: "1000.00", taxRate: "18.00" },
     ]);
     expect(totals).toEqual({
@@ -74,7 +74,7 @@ describe("calculateQuoteTotals", () => {
   });
 
   it("sums multiple items with different discounts and tax rates", () => {
-    const { items, totals } = calculateQuoteTotals([
+    const { items, totals } = calculateDocumentTotals([
       { quantity: "1", unitPrice: "100.00", discountAmount: "0.00", taxRate: "18.00" },
       { quantity: "3", unitPrice: "50.00", discountAmount: "10.00", taxRate: "5.00" },
     ]);
@@ -93,7 +93,7 @@ describe("calculateQuoteTotals", () => {
   });
 
   it("returns zeroed totals for an empty item list", () => {
-    const { items, totals } = calculateQuoteTotals([]);
+    const { items, totals } = calculateDocumentTotals([]);
     expect(items).toEqual([]);
     expect(totals).toEqual({
       subtotal: "0.00",

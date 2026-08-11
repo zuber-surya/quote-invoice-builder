@@ -42,7 +42,7 @@ function todayIso() {
 }
 
 // docs/UI-UX Specification.md section 31 — preview updates immediately as the
-// user edits quantity/price/discount/tax. This mirrors lib/quote-calculation.ts
+// user edits quantity/price/discount/tax. This mirrors lib/document-calculation.ts
 // but uses plain numbers: it's a UX convenience only, never authoritative
 // (CLAUDE.md rule 10 — the server always recalculates).
 function previewTotals(items: QuoteItemFormValues[]) {
