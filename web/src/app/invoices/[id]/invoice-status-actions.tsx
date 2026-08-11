@@ -3,16 +3,17 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { RecordPaymentForm } from "./record-payment-form";
 
 // Mirrors quotes/[id]/quote-status-actions.tsx. Invoices are created UNPAID
 // (not DRAFT) by both direct creation and quote conversion (API Spec 46-47),
 // so Edit/Delete are effectively unreachable today but kept for the DRAFT
-// status the schema reserves (InvoiceStatus enum). Payment recording — the
-// action that actually applies to UNPAID/PARTIALLY_PAID invoices — is Sprint 10.
+// status the schema reserves (InvoiceStatus enum).
 export function InvoiceStatusActions({ invoiceId, status }: { invoiceId: string; status: string }) {
   const router = useRouter();
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showPaymentForm, setShowPaymentForm] = useState(false);
 
   async function handleDelete() {
     if (!confirm("Delete this invoice?\n\nThis action cannot be undone.")) return;
@@ -50,6 +51,11 @@ export function InvoiceStatusActions({ invoiceId, status }: { invoiceId: string;
             </button>
           </>
         )}
+        {(status === "UNPAID" || status === "PARTIALLY_PAID") && !showPaymentForm && (
+          <button type="button" onClick={() => setShowPaymentForm(true)} className={primaryClass}>
+            Record Payment
+          </button>
+        )}
         <a
           href={`/api/v1/invoices/${invoiceId}/pdf`}
           target="_blank"
@@ -60,8 +66,10 @@ export function InvoiceStatusActions({ invoiceId, status }: { invoiceId: string;
         </a>
       </div>
 
-      {(status === "UNPAID" || status === "PARTIALLY_PAID") && (
-        <p className="text-sm text-zinc-500">Payment recording is coming in a later update.</p>
+      {showPaymentForm && (
+        <div className="w-full">
+          <RecordPaymentForm invoiceId={invoiceId} onClose={() => setShowPaymentForm(false)} />
+        </div>
       )}
 
       {error && (
