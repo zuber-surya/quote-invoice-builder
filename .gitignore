@@ -19,6 +19,10 @@ dist/
 .DS_Store
 *.pem
 
+# playwright mcp scratch output (manual browser test runs)
+.playwright-mcp/
+/*.png
+
 # debug
 npm-debug.log*
 yarn-debug.log*

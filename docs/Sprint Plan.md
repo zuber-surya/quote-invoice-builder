@@ -36,10 +36,10 @@ API is stable. Not part of this milestone's sprints.
 | 5 | Products / Services (CRUD, search) | ✅ Done |
 | 6 | Quotes — Calculation Engine & API | ✅ Done |
 | 7 | Quotes — UI (list, create/edit, detail, status) | ✅ Done |
-| 8 | Quotes — PDF generation | ✅ Done (PR #30, unmerged as of this writing) |
+| 8 | Quotes — PDF generation | ✅ Done (PR #30) |
 | 9a | Invoice API + Quote → Invoice Conversion | ✅ Done (PR #43) |
-| 9b | **Invoice UI (list, create, detail)** | 🔵 Next |
-| 9c | Invoice PDF | ⬜ Not started |
+| 9b | Invoice UI (list, create, detail) | ✅ Done (PR #48) |
+| 9c | **Invoice PDF** | 🔵 Next |
 | 10 | Payments (record payment, status derivation) | ⬜ Not started |
 | 11 | Dashboard (summary cards, recent documents) | ⬜ Not started |
 | 12 | Responsive Polish (desktop/tablet/mobile web) | ⬜ Not started |
