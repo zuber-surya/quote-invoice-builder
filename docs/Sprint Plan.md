@@ -43,8 +43,8 @@ API is stable. Not part of this milestone's sprints.
 | 10 | Payments (record payment, status derivation) | ��� � � ✅ Done (PR #57) |
 | 11 | Dashboard (summary cards, recent documents) | ��� � � ✅ Done (PR #61) |
 | 12a | **shadcn/ui foundation + Customers reference migration** | ��� � � ✅ Done |
-| 12b | Responsive Polish — apply pattern to remaining screens | ���� �� �� 🔵 Next (Quotes & Invoices done) |
-| 13 | QA pass + Deployment prep | ���� �� �� ⬜ Not started |
+| 12b | Responsive Polish — apply pattern to remaining screens | ��� � � ✅ Done (PR #65) |
+| 13 | QA pass + Deployment prep | ���� �� �� 🔵 Next |
 | — | Integration/E2E test infrastructure (backlog, unscheduled) | ���� �� �� ⬜ Backlog |
 
 ---
