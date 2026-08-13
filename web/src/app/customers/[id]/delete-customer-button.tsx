@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 export function DeleteCustomerButton({ customerId }: { customerId: string }) {
   const router = useRouter();
@@ -14,29 +15,33 @@ export function DeleteCustomerButton({ customerId }: { customerId: string }) {
     setDeleting(true);
     setError(null);
 
-    const response = await fetch(`/api/v1/customers/${customerId}`, { method: "DELETE" });
-    const result = await response.json().catch(() => null);
-    setDeleting(false);
+    try {
+      const response = await fetch(`/api/v1/customers/${customerId}`, { method: "DELETE" });
+      const result = await response.json().catch(() => null);
+      setDeleting(false);
 
-    if (!response.ok || !result?.success) {
-      setError(result?.error?.message ?? "Unable to delete customer. Please try again.");
-      return;
+      if (!response.ok || !result?.success) {
+        setError(result?.error?.message ?? "Unable to delete customer. Please try again.");
+        return;
+      }
+
+      router.push("/customers");
+      router.refresh();
+    } catch (error) {
+      setDeleting(false);
+      setError("Network error. Please check your connection and try again.");
     }
-
-    router.push("/customers");
-    router.refresh();
   }
 
   return (
     <div className="flex flex-col items-end gap-1">
-      <button
-        type="button"
+      <Button
+        variant="destructive"
         onClick={handleDelete}
         disabled={deleting}
-        className="rounded-md border border-red-300 px-4 py-2 text-sm font-medium text-red-600 hover:bg-red-50 disabled:opacity-60"
       >
         {deleting ? "Deleting…" : "Delete"}
-      </button>
+      </Button>
       {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );

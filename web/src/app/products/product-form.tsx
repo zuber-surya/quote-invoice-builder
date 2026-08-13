@@ -2,6 +2,10 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 type ProductFormValues = {
   name: string;
@@ -27,6 +31,7 @@ function Field({
   required,
   placeholder,
   textarea,
+  type = "text",
 }: {
   label: string;
   name: keyof ProductFormValues;
@@ -35,34 +40,32 @@ function Field({
   required?: boolean;
   placeholder?: string;
   textarea?: boolean;
+  type?: string;
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-sm font-medium text-zinc-700">
+      <Label htmlFor={name}>
         {label}
         {required ? " *" : ""}
-      </label>
+      </Label>
       {textarea ? (
-        <textarea
+        <Textarea
           id={name}
           name={name}
           required={required}
           value={value}
           onChange={(e) => onChange(name, e.target.value)}
           rows={3}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
         />
       ) : (
-        <input
+        <Input
           id={name}
           name={name}
-          type="text"
-          inputMode={name === "price" || name === "taxRate" ? "decimal" : "text"}
-          required={required}
+          type={type}
           placeholder={placeholder}
+          required={required}
           value={value}
           onChange={(e) => onChange(name, e.target.value)}
-          className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
         />
       )}
     </div>
@@ -97,26 +100,31 @@ export function ProductForm({
     setFieldErrors({});
     setSaving(true);
 
-    const url = mode === "create" ? "/api/v1/products" : `/api/v1/products/${productId}`;
-    const response = await fetch(url, {
-      method: mode === "create" ? "POST" : "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(values),
-    });
+    try {
+      const url = mode === "create" ? "/api/v1/products" : `/api/v1/products/${productId}`;
+      const response = await fetch(url, {
+        method: mode === "create" ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(values),
+      });
 
-    const result = await response.json().catch(() => null);
-    setSaving(false);
+      const result = await response.json().catch(() => null);
+      setSaving(false);
 
-    if (!response.ok || !result?.success) {
-      if (result?.error?.code === "VALIDATION_ERROR") {
-        setFieldErrors(result.error.fields ?? {});
+      if (!response.ok || !result?.success) {
+        if (result?.error?.code === "VALIDATION_ERROR") {
+          setFieldErrors(result.error.fields ?? {});
+        }
+        setFormError(result?.error?.message ?? "Unable to save product. Please try again.");
+        return;
       }
-      setFormError(result?.error?.message ?? "Unable to save product. Please try again.");
-      return;
-    }
 
-    router.push(`/products/${result.data.id}`);
-    router.refresh();
+      router.push(`/products/${result.data.id}`);
+      router.refresh();
+    } catch (error) {
+      setSaving(false);
+      setFormError("Network error. Please check your connection and try again.");
+    }
   }
 
   return (
@@ -124,13 +132,13 @@ export function ProductForm({
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
         <Field label="Product / Service Name" name="name" value={values.name} onChange={updateField} required />
         <Field label="Unit" name="unit" value={values.unit} onChange={updateField} required placeholder="Project, Hour, Kg…" />
-        <Field label="Price" name="price" value={values.price} onChange={updateField} required placeholder="25000.00" />
-        <Field label="Tax %" name="taxRate" value={values.taxRate} onChange={updateField} placeholder="18.00" />
+        <Field label="Price" name="price" value={values.price} onChange={updateField} required type="number" placeholder="25000.00" />
+        <Field label="Tax %" name="taxRate" value={values.taxRate} onChange={updateField} type="number" placeholder="18.00" />
       </div>
       <Field label="Description" name="description" value={values.description} onChange={updateField} textarea />
 
       {Object.keys(fieldErrors).length > 0 && (
-        <ul className="text-sm text-red-600">
+        <ul className="text-sm text-destructive">
           {Object.entries(fieldErrors).map(([field, message]) => (
             <li key={field}>{message}</li>
           ))}
@@ -138,18 +146,14 @@ export function ProductForm({
       )}
 
       {formError && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-destructive">
           {formError}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-fit rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={saving} className="w-fit">
         {saving ? "Saving…" : mode === "create" ? "Create Product" : "Save Changes"}
-      </button>
+      </Button>
     </form>
   );
 }

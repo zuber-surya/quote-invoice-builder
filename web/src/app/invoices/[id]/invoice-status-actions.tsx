@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 import { RecordPaymentForm } from "./record-payment-form";
 
 // Mirrors quotes/[id]/quote-status-actions.tsx. Invoices are created UNPAID
@@ -33,36 +34,41 @@ export function InvoiceStatusActions({ invoiceId, status }: { invoiceId: string;
     router.refresh();
   }
 
-  const buttonClass =
-    "rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-60";
-  const primaryClass =
-    "rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60";
-
   return (
     <div className="flex flex-col items-end gap-2">
       <div className="flex flex-wrap justify-end gap-2">
         {status === "DRAFT" && (
           <>
-            <Link href={`/invoices/${invoiceId}/edit`} className={buttonClass}>
-              Edit
+            <Link href={`/invoices/${invoiceId}/edit`}>
+              <Button variant="outline">Edit</Button>
             </Link>
-            <button type="button" disabled={busy} onClick={handleDelete} className={buttonClass}>
-              Delete
-            </button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={busy}
+            >
+              {busy ? "Deleting…" : "Delete"}
+            </Button>
           </>
         )}
         {(status === "UNPAID" || status === "PARTIALLY_PAID") && !showPaymentForm && (
-          <button type="button" onClick={() => setShowPaymentForm(true)} className={primaryClass}>
-            Record Payment
-          </button>
+          <Button
+            onClick={() => setShowPaymentForm(true)}
+            disabled={busy}
+          >
+            {busy ? "Recording…" : "Record Payment"}
+          </Button>
         )}
         <a
           href={`/api/v1/invoices/${invoiceId}/pdf`}
           target="_blank"
           rel="noreferrer"
-          className={status === "DRAFT" ? buttonClass : primaryClass}
         >
-          Download PDF
+          <Button
+            variant={status === "DRAFT" ? "outline" : "default"}
+          >
+            Download PDF
+          </Button>
         </a>
       </div>
 

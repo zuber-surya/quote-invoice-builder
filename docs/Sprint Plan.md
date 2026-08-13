@@ -29,22 +29,23 @@ API is stable. Not part of this milestone's sprints.
 
 | # | Sprint | Status |
 |---|--------|--------|
-| 1 | Repo & Backend Foundation (DB, Prisma, `/health`) | ✅ Done |
-| 2 | Auth (register/login/logout, ownership middleware) | ✅ Done |
-| 3 | Business Profile | ✅ Done |
-| 4 | Customers (CRUD, search, ownership) | ✅ Done |
-| 5 | Products / Services (CRUD, search) | ✅ Done |
-| 6 | Quotes — Calculation Engine & API | ✅ Done |
-| 7 | Quotes — UI (list, create/edit, detail, status) | ✅ Done |
-| 8 | Quotes — PDF generation | ✅ Done (PR #30) |
-| 9a | Invoice API + Quote → Invoice Conversion | ✅ Done (PR #43) |
-| 9b | Invoice UI (list, create, detail) | ✅ Done (PR #48) |
-| 9c | Invoice PDF | ✅ Done (PR #53) |
-| 10 | Payments (record payment, status derivation) | ✅ Done (PR #57) |
-| 11 | **Dashboard (summary cards, recent documents)** | 🔵 Next |
-| 12 | Responsive Polish (desktop/tablet/mobile web) | ⬜ Not started |
-| 13 | QA pass + Deployment prep | ⬜ Not started |
-| — | Integration/E2E test infrastructure (backlog, unscheduled) | ⬜ Backlog |
+| 1 | Repo & Backend Foundation (DB, Prisma, `/health`) | ��� � � ✅ Done |
+| 2 | Auth (register/login/logout, ownership middleware) | ��� � � ✅ Done |
+| 3 | Business Profile | ��� � � ✅ Done |
+| 4 | Customers (CRUD, search, ownership) | ��� � � ✅ Done |
+| 5 | Products / Services (CRUD, search) | ��� � � ✅ Done |
+| 6 | Quotes — Calculation Engine & API | ��� � � ✅ Done |
+| 7 | Quotes — UI (list, create/edit, detail, status) | ��� � � ✅ Done |
+| 8 | Quotes — PDF generation | ��� � � ✅ Done (PR #30) |
+| 9a | Invoice API + Quote → Invoice Conversion | ��� � � ✅ Done (PR #43) |
+| 9b | Invoice UI (list, create, detail) | ��� � � ✅ Done (PR #48) |
+| 9c | Invoice PDF | ��� � � ✅ Done (PR #53) |
+| 10 | Payments (record payment, status derivation) | ��� � � ✅ Done (PR #57) |
+| 11 | Dashboard (summary cards, recent documents) | ��� � � ✅ Done (PR #61) |
+| 12a | **shadcn/ui foundation + Customers reference migration** | ��� � � ✅ Done |
+| 12b | Responsive Polish — apply pattern to remaining screens | ���� �� �� 🔵 Next (Quotes & Invoices done) |
+| 13 | QA pass + Deployment prep | ���� �� �� ⬜ Not started |
+| — | Integration/E2E test infrastructure (backlog, unscheduled) | ���� �� �� ⬜ Backlog |
 
 ---
 
@@ -171,13 +172,44 @@ Full task breakdown tracked as GitHub issues under milestone "Sprint 11: Dashboa
    Quotes list, Recent Invoices list. Replaces the current placeholder in
    `app/dashboard/page.tsx`.
 
+---
+
+## Sprint 12a (current): shadcn/ui foundation + Customers reference migration
+
+**Goal**: adopt shadcn/ui (Architecture Decisions ADR-2 — deferred until this sprint) and
+migrate the Customers flow as the reference pattern, with a responsive audit proving it
+out, before Sprint 12b repeats the pattern across the remaining screens.
+
+**Docs to read first**: Web Development Standards §33–39, §108, §112; Architecture
+Decisions ADR-2.
+
+Full task breakdown tracked as GitHub issues under milestone "Sprint 12: Responsive
+Polish" (issues #62–#64):
+
+1. Install/configure shadcn/ui for this Tailwind v4 project. Add the primitives existing
+   screens need: Button, Input, Label, Select, Textarea, Table, Badge, Card. **Does not**
+   add react-hook-form — that's a separate, optional dependency decision (Web Dev
+   Standards §41) not bundled into this sprint.
+2. Migrate `app/customers/**` to shadcn primitives — swap the visual layer only, keep
+   existing controlled-state/fetch logic unchanged.
+3. Responsive audit of the Customers flow at 390/768/1280px (plus 320/375/414/1024/1440
+   for the list screen) — table→card transform on mobile (§39). This becomes the
+   checklist Sprint 12b applies everywhere else.
+
+**Explicitly not in this sprint**: Products/Quotes/Invoices/Dashboard migration (Sprint
+12b, once the pattern is proven on Customers).
+
+---
+
 ## Later Sprints (scope only, not yet broken into tasks)
 
-- **Sprint 12 — Responsive Polish**: PRD §25 breakpoints, table→card transforms on mobile.
-  Also the natural point to adopt shadcn/ui (Architecture Decisions ADR-2) since this
-  sprint is already touching every screen's accessibility/responsive behavior.
+- **Sprint 12b — Responsive Polish (remaining screens)**: apply Sprint 12a's shadcn
+  pattern to Products, Quotes, Invoices, Dashboard; full responsive pass per PRD §25
+  breakpoints across all of them.
 - **Sprint 13 — QA & Deployment prep**: Testing & QA Spec, Deployment & Infrastructure
   Spec — full pass before considering V1 shippable.
+
+---
 
 ## Backlog (unscheduled)
 

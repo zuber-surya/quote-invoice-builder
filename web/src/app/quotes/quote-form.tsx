@@ -2,6 +2,17 @@
 
 import { useEffect, useMemo, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Textarea } from "@/components/ui/textarea";
 
 type CustomerOption = { id: string; name: string };
 type ProductOption = { id: string; name: string; unit: string; price: string; taxRate: string; description: string | null };
@@ -174,25 +185,30 @@ export function QuoteForm({
       })),
     };
 
-    const response = await fetch(url, {
-      method: mode === "create" ? "POST" : "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
+    try {
+      const response = await fetch(url, {
+        method: mode === "create" ? "POST" : "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
 
-    const result = await response.json().catch(() => null);
-    setSaving(false);
+      const result = await response.json().catch(() => null);
+      setSaving(false);
 
-    if (!response.ok || !result?.success) {
-      if (result?.error?.code === "VALIDATION_ERROR") {
-        setFieldErrors(result.error.fields ?? {});
+      if (!response.ok || !result?.success) {
+        if (result?.error?.code === "VALIDATION_ERROR") {
+          setFieldErrors(result.error.fields ?? {});
+        }
+        setFormError(result?.error?.message ?? "Unable to save quote. Please try again.");
+        return;
       }
-      setFormError(result?.error?.message ?? "Unable to save quote. Please try again.");
-      return;
-    }
 
-    router.push(`/quotes/${result.data.id}`);
-    router.refresh();
+      router.push(`/quotes/${result.data.id}`);
+      router.refresh();
+    } catch (error) {
+      setSaving(false);
+      setFormError("Network error. Please check your connection and try again.");
+    }
   }
 
   return (
@@ -200,47 +216,47 @@ export function QuoteForm({
       <div className="flex flex-col gap-6">
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div className="flex flex-col gap-1 sm:col-span-1">
-            <label htmlFor="customerId" className="text-sm font-medium text-zinc-700">
+            <Label htmlFor="customerId">
               Customer *
-            </label>
-            <select
-              id="customerId"
+            </Label>
+            <Select
               required
               value={values.customerId}
-              onChange={(e) => updateField("customerId", e.target.value)}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
+              onValueChange={(value) => updateField("customerId", value ?? "")}
             >
-              <option value="">Select customer</option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
-            </select>
+              <SelectTrigger id="customerId" className="w-full">
+                <SelectValue placeholder="Select customer" />
+              </SelectTrigger>
+              <SelectContent>
+                {customers.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="quoteDate" className="text-sm font-medium text-zinc-700">
+            <Label htmlFor="quoteDate">
               Quote Date *
-            </label>
-            <input
+            </Label>
+            <Input
               id="quoteDate"
               type="date"
               required
               value={values.quoteDate}
               onChange={(e) => updateField("quoteDate", e.target.value)}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="expiryDate" className="text-sm font-medium text-zinc-700">
+            <Label htmlFor="expiryDate">
               Expiry Date
-            </label>
-            <input
+            </Label>
+            <Input
               id="expiryDate"
               type="date"
               value={values.expiryDate}
               onChange={(e) => updateField("expiryDate", e.target.value)}
-              className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
             />
           </div>
         </div>
@@ -248,13 +264,14 @@ export function QuoteForm({
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
             <h2 className="text-sm font-medium text-zinc-700">Items</h2>
-            <button
+            <Button
               type="button"
               onClick={addItem}
-              className="rounded-md border border-zinc-300 px-3 py-1.5 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
+              variant="outline"
+              size="sm"
             >
               + Add Item
-            </button>
+            </Button>
           </div>
 
           <div className="flex flex-col gap-3">
@@ -262,85 +279,98 @@ export function QuoteForm({
               <div key={index} className="rounded-lg border border-zinc-200 p-4">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-6">
                   <div className="flex flex-col gap-1 sm:col-span-2">
-                    <label className="text-xs font-medium text-zinc-500">Product / Service</label>
-                    <select
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Product / Service
+                    </Label>
+                    <Select
                       value={item.productId}
-                      onChange={(e) => selectProduct(index, e.target.value)}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
+                      onValueChange={(value) => selectProduct(index, value ?? "")}
                     >
-                      <option value="">Custom Item</option>
-                      {products.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
-                    </select>
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Custom Item" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">
-                    <label className="text-xs font-medium text-zinc-500">Name *</label>
-                    <input
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Name *
+                    </Label>
+                    <Input
                       required
                       value={item.name}
                       onChange={(e) => updateItem(index, { name: e.target.value })}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-zinc-500">Unit *</label>
-                    <input
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Unit *
+                    </Label>
+                    <Input
                       required
                       value={item.unit}
                       onChange={(e) => updateItem(index, { unit: e.target.value })}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-zinc-500">Qty *</label>
-                    <input
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Qty *
+                    </Label>
+                    <Input
                       required
                       inputMode="decimal"
                       value={item.quantity}
                       onChange={(e) => updateItem(index, { quantity: e.target.value })}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-zinc-500">Unit Price *</label>
-                    <input
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Unit Price *
+                    </Label>
+                    <Input
                       required
                       inputMode="decimal"
                       value={item.unitPrice}
                       onChange={(e) => updateItem(index, { unitPrice: e.target.value })}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-zinc-500">Discount</label>
-                    <input
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Discount
+                    </Label>
+                    <Input
                       inputMode="decimal"
                       value={item.discountAmount}
                       onChange={(e) => updateItem(index, { discountAmount: e.target.value })}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <label className="text-xs font-medium text-zinc-500">Tax %</label>
-                    <input
+                    <Label className="text-xs font-medium text-zinc-500">
+                      Tax %
+                    </Label>
+                    <Input
                       inputMode="decimal"
                       value={item.taxRate}
                       onChange={(e) => updateItem(index, { taxRate: e.target.value })}
-                      className="rounded-md border border-zinc-300 px-2 py-1.5 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
                     />
                   </div>
                 </div>
                 {values.items.length > 1 && (
-                  <button
+                  <Button
                     type="button"
                     onClick={() => removeItem(index)}
-                    className="mt-2 text-xs font-medium text-red-600 hover:underline"
+                    variant="outline"
+                    size="xs"
+                    className="mt-2"
                   >
                     Remove item
-                  </button>
+                  </Button>
                 )}
               </div>
             ))}
@@ -348,39 +378,37 @@ export function QuoteForm({
         </div>
 
         <div className="flex flex-col gap-1">
-          <label htmlFor="notes" className="text-sm font-medium text-zinc-700">
+          <Label htmlFor="notes">
             Notes
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             id="notes"
             rows={2}
             value={values.notes}
             onChange={(e) => updateField("notes", e.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
           />
         </div>
         <div className="flex flex-col gap-1">
-          <label htmlFor="terms" className="text-sm font-medium text-zinc-700">
+          <Label htmlFor="terms">
             Terms
-          </label>
-          <textarea
+          </Label>
+          <Textarea
             id="terms"
             rows={2}
             value={values.terms}
             onChange={(e) => updateField("terms", e.target.value)}
-            className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
           />
         </div>
 
         {Object.keys(fieldErrors).length > 0 && (
-          <ul className="text-sm text-red-600">
+          <ul className="text-sm text-destructive">
             {Object.entries(fieldErrors).map(([field, message]) => (
               <li key={field}>{message}</li>
             ))}
           </ul>
         )}
         {formError && (
-          <p role="alert" className="text-sm text-red-600">
+          <p role="alert" className="text-sm text-destructive">
             {formError}
           </p>
         )}
@@ -408,13 +436,13 @@ export function QuoteForm({
           </div>
         </dl>
 
-        <button
+        <Button
           type="submit"
           disabled={saving}
-          className="mt-5 w-full rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
+          className="mt-5 w-full"
         >
           {saving ? "Saving…" : mode === "create" ? "Save Draft" : "Save Changes"}
-        </button>
+        </Button>
       </div>
     </form>
   );

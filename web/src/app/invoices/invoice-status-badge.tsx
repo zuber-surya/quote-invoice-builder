@@ -1,9 +1,7 @@
-const STYLES: Record<string, string> = {
-  DRAFT: "bg-zinc-100 text-zinc-700",
-  UNPAID: "bg-amber-100 text-amber-700",
-  PARTIALLY_PAID: "bg-blue-100 text-blue-700",
-  PAID: "bg-green-100 text-green-700",
-};
+import { Badge, badgeVariants } from "@/components/ui/badge";
+import { type VariantProps } from "class-variance-authority";
+
+type BadgeVariant = NonNullable<VariantProps<typeof badgeVariants>["variant"]>;
 
 const LABELS: Record<string, string> = {
   DRAFT: "Draft",
@@ -12,13 +10,20 @@ const LABELS: Record<string, string> = {
   PAID: "Paid",
 };
 
+const VARIANTS: Record<string, BadgeVariant> = {
+  DRAFT: "secondary",
+  UNPAID: "destructive",
+  PARTIALLY_PAID: "secondary",
+  PAID: "default",
+};
+
 // docs/UI-UX Specification.md sections 26-27, 33-34 equivalent for invoices — status
 // pill shown across the invoice list, cards, and detail header. Mirrors
 // quotes/quote-status-badge.tsx.
-export function InvoiceStatusBadge({ status }: { status: string }) {
+export function InvoiceStatusBadge({ status, className }: { status: string; className?: string }) {
   return (
-    <span className={`inline-flex rounded-full px-2.5 py-0.5 text-xs font-medium ${STYLES[status] ?? STYLES.DRAFT}`}>
+    <Badge variant={VARIANTS[status] ?? "secondary"} className={className}>
       {LABELS[status] ?? status}
-    </span>
+    </Badge>
   );
 }

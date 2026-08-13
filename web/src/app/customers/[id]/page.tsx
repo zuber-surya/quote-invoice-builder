@@ -3,6 +3,8 @@ import { notFound, redirect } from "next/navigation";
 import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { DeleteCustomerButton } from "./delete-customer-button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 function DetailRow({ label, value }: { label: string; value: string | null }) {
   return (
@@ -42,8 +44,11 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
         </div>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Contact Information</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <DetailRow label="Email" value={customer.email} />
           <DetailRow label="Phone" value={customer.phone} />
           <DetailRow label="Address" value={customer.address} />
@@ -52,29 +57,43 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
           <DetailRow label="Country" value={customer.country} />
           <DetailRow label="Postal Code" value={customer.postalCode} />
           <DetailRow label="Tax / GST Number" value={customer.taxNumber} />
-        </dl>
-        {customer.notes && (
-          <div className="mt-4">
+        </CardContent>
+      </Card>
+
+      {customer.notes && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Notes</CardTitle>
+          </CardHeader>
+          <CardContent className="mt-4">
             <DetailRow label="Notes" value={customer.notes} />
-          </div>
-        )}
-      </div>
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="text-sm font-medium text-zinc-700">Quotes</h2>
-          <p className="mt-1 text-2xl font-semibold text-zinc-900">{customer._count.quotes}</p>
-          {customer._count.quotes === 0 && (
-            <p className="mt-1 text-sm text-zinc-500">Quote management isn&apos;t available yet.</p>
-          )}
-        </div>
-        <div className="rounded-lg border border-zinc-200 bg-white p-6">
-          <h2 className="text-sm font-medium text-zinc-700">Invoices</h2>
-          <p className="mt-1 text-2xl font-semibold text-zinc-900">{customer._count.invoices}</p>
-          {customer._count.invoices === 0 && (
-            <p className="mt-1 text-sm text-zinc-500">Invoice management isn&apos;t available yet.</p>
-          )}
-        </div>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Quotes</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center py-8">
+            <p className="mt-1 text-2xl font-semibold text-zinc-900">{customer._count.quotes}</p>
+            {customer._count.quotes === 0 && (
+              <p className="mt-1 text-sm text-zinc-500">Quote management isn&apos;t available yet.</p>
+            )}
+          </CardContent>
+        </Card>
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Invoices</CardTitle>
+          </CardHeader>
+          <CardContent className="flex flex-col items-center justify-center py-8">
+            <p className="mt-1 text-2xl font-semibold text-zinc-900">{customer._count.invoices}</p>
+            {customer._count.invoices === 0 && (
+              <p className="mt-1 text-sm text-zinc-500">Invoice management isn&apos;t available yet.</p>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
