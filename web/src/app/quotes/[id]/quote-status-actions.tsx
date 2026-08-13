@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { Button } from "@/components/ui/button";
 
 // docs/UI-UX Specification.md section 34 — only valid actions are shown for the
 // current status.
@@ -72,75 +73,87 @@ export function QuoteStatusActions({
     router.refresh();
   }
 
-  const buttonClass =
-    "rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50 disabled:opacity-60";
-  const primaryClass =
-    "rounded-md bg-zinc-900 px-4 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60";
-
   return (
     <div className="flex flex-col items-end gap-2">
       <div className="flex flex-wrap justify-end gap-2">
         {status === "DRAFT" && (
           <>
-            <Link href={`/quotes/${quoteId}/edit`} className={buttonClass}>
-              Edit
+            <Link href={`/quotes/${quoteId}/edit`}>
+              <Button variant="outline">Edit</Button>
             </Link>
-            <button type="button" disabled={busy} onClick={handleDelete} className={buttonClass}>
-              Delete
-            </button>
-            <button type="button" disabled={busy} onClick={() => changeStatus("SENT")} className={primaryClass}>
-              Send / Mark as Sent
-            </button>
+            <Button
+              variant="destructive"
+              onClick={handleDelete}
+              disabled={busy}
+            >
+              {busy ? "Deleting…" : "Delete"}
+            </Button>
+            <Button
+              onClick={() => changeStatus("SENT")}
+              disabled={busy}
+            >
+              {busy ? "Updating…" : "Send / Mark as Sent"}
+            </Button>
           </>
         )}
 
         {status === "SENT" && (
           <>
-            <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={buttonClass}>
-              Download PDF
+            <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer">
+              <Button variant="outline">Download PDF</Button>
             </a>
-            <button type="button" disabled={busy} onClick={() => changeStatus("REJECTED")} className={buttonClass}>
-              Mark Rejected
-            </button>
-            <button type="button" disabled={busy} onClick={() => changeStatus("ACCEPTED")} className={primaryClass}>
-              Mark Accepted
-            </button>
+            <Button
+              variant="outline"
+              onClick={() => changeStatus("REJECTED")}
+              disabled={busy}
+            >
+              {busy ? "Updating…" : "Mark Rejected"}
+            </Button>
+            <Button
+              onClick={() => changeStatus("ACCEPTED")}
+              disabled={busy}
+            >
+              {busy ? "Updating…" : "Mark Accepted"}
+            </Button>
           </>
         )}
 
         {(status === "REJECTED" || status === "EXPIRED") && (
-          <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={primaryClass}>
-            Download PDF
+          <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer">
+            <Button>Download PDF</Button>
           </a>
         )}
 
         {status === "ACCEPTED" && (
           <>
-            <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer" className={buttonClass}>
-              Download PDF
+            <a href={`/api/v1/quotes/${quoteId}/pdf`} target="_blank" rel="noreferrer">
+              <Button variant="outline">Download PDF</Button>
             </a>
             {invoiceId ? (
-              <Link href={`/invoices/${invoiceId}`} className={primaryClass}>
-                View Invoice
+              <Link href={`/invoices/${invoiceId}`}>
+                <Button>View Invoice</Button>
               </Link>
             ) : (
-              <button type="button" disabled={busy} onClick={handleConvert} className={primaryClass}>
-                Convert to Invoice
-              </button>
+              <Button
+                onClick={handleConvert}
+                disabled={busy}
+              >
+                {busy ? "Converting…" : "Convert to Invoice"}
+              </Button>
             )}
           </>
         )}
       </div>
 
       {status === "SENT" && (
-        <button
-          type="button"
-          disabled={busy}
+        <Button
+          variant="outline"
+          size="xs"
           onClick={() => changeStatus("EXPIRED")}
-          className="text-xs font-medium text-zinc-500 hover:underline"
+          disabled={busy}
         >
           Mark as expired
-        </button>
+        </Button>
       )}
 
       {error && (
