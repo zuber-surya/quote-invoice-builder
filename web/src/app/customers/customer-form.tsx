@@ -43,6 +43,7 @@ function Field({
   required,
   type = "text",
   textarea,
+  pattern,
 }: {
   label: string;
   name: keyof CustomerFormValues;
@@ -51,6 +52,7 @@ function Field({
   required?: boolean;
   type?: string;
   textarea?: boolean;
+  pattern?: string;
 }) {
   return (
     <div className="flex flex-col gap-1">
@@ -75,6 +77,7 @@ function Field({
           required={required}
           value={value}
           onChange={(e) => onChange(name, e.target.value)}
+          pattern={pattern}
         />
       )}
     </div>

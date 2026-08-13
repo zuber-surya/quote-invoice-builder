@@ -4,7 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { InvoiceStatusBadge } from "./invoice-status-badge";
 
@@ -27,6 +33,8 @@ type ListResponse = {
 };
 
 const STATUS_OPTIONS = ["DRAFT", "UNPAID", "PARTIALLY_PAID", "PAID"];
+const ALL_STATUSES = "ALL";
+const ALL_CUSTOMERS = "ALL";
 const STATUS_LABELS: Record<string, string> = {
   DRAFT: "Draft",
   UNPAID: "Unpaid",
@@ -107,34 +115,42 @@ export function InvoiceList() {
             }}
           />
           <Select
-            value={status}
+            value={status || ALL_STATUSES}
             onValueChange={(value) => {
               setPage(1);
-              setStatus(value ?? "");
+              setStatus(value === ALL_STATUSES ? "" : value ?? "");
             }}
-            placeholder="All statuses"
           >
-            <option value="">All statuses</option>
-            {STATUS_OPTIONS.map((s) => (
-              <option key={s} value={s}>
-                {STATUS_LABELS[s]}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="All statuses" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
+              {STATUS_OPTIONS.map((s) => (
+                <SelectItem key={s} value={s}>
+                  {STATUS_LABELS[s]}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
           <Select
-            value={customerId}
+            value={customerId || ALL_CUSTOMERS}
             onValueChange={(value) => {
               setPage(1);
-              setCustomerId(value ?? "");
+              setCustomerId(value === ALL_CUSTOMERS ? "" : value ?? "");
             }}
-            placeholder="All customers"
           >
-            <option value="">All customers</option>
-            {customers.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
+            <SelectTrigger>
+              <SelectValue placeholder="All customers" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALL_CUSTOMERS}>All customers</SelectItem>
+              {customers.map((c) => (
+                <SelectItem key={c.id} value={c.id}>
+                  {c.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
           </Select>
         </div>
         <Link href="/invoices/new">
@@ -230,7 +246,7 @@ export function InvoiceList() {
         {/* Mobile: Card view */}
         <div className="space-y-4">
           {!loading && rows.length === 0 ? (
-            <p className="text-center text-zinc-500 py-8">
+            <div className="text-center text-zinc-500 py-8">
               {hasFilters ? (
                 <span className="text-zinc-500">No invoices match your filters.</span>
               ) : (
@@ -239,7 +255,7 @@ export function InvoiceList() {
                   <p className="text-zinc-500">Create your first invoice, or convert an accepted quote.</p>
                 </div>
               )}
-            </p>
+            </div>
           ) : (
             <>
               {rows.map((invoice) => (

@@ -5,7 +5,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Select } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 
 type CustomerOption = { id: string; name: string };
@@ -215,18 +221,20 @@ export function InvoiceForm({
               Customer *
             </Label>
             <Select
-              id="customerId"
               required
               value={values.customerId}
               onValueChange={(value) => updateField("customerId", value ?? "")}
-              className="w-full"
             >
-              <option value="">Select customer</option>
-              {customers.map((c) => (
-                <option key={c.id} value={c.id}>
-                  {c.name}
-                </option>
-              ))}
+              <SelectTrigger id="customerId" className="w-full">
+                <SelectValue placeholder="Select customer" />
+              </SelectTrigger>
+              <SelectContent>
+                {customers.map((c) => (
+                  <SelectItem key={c.id} value={c.id}>
+                    {c.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
             </Select>
           </div>
           <div className="flex flex-col gap-1">
@@ -278,14 +286,17 @@ export function InvoiceForm({
                     <Select
                       value={item.productId}
                       onValueChange={(value) => selectProduct(index, value ?? "")}
-                      className="w-full"
                     >
-                      <option value="">Custom Item</option>
-                      {products.map((p) => (
-                        <option key={p.id} value={p.id}>
-                          {p.name}
-                        </option>
-                      ))}
+                      <SelectTrigger className="w-full">
+                        <SelectValue placeholder="Custom Item" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {products.map((p) => (
+                          <SelectItem key={p.id} value={p.id}>
+                            {p.name}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
                     </Select>
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">

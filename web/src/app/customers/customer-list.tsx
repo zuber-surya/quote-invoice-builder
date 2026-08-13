@@ -113,11 +113,11 @@ export function CustomerList() {
                     {customer.name}
                   </Link>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600>{customer.companyName ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600>{customer.email ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600>{customer.phone ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600>{customer.quoteCount}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600>{customer.invoiceCount}</TableCell>
+                <TableCell className="px-4 py-3 text-zinc-600">{customer.companyName ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-zinc-600">{customer.email ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-zinc-600">{customer.phone ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-zinc-600">{customer.quoteCount}</TableCell>
+                <TableCell className="px-4 py-3 text-zinc-600">{customer.invoiceCount}</TableCell>
               </TableRow>
             ))}
           </TableBody>

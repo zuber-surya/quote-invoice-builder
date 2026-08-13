@@ -4,6 +4,8 @@ import { getCurrentUser } from "@/lib/get-current-user";
 import { prisma } from "@/lib/prisma";
 import { formatDecimal } from "@/lib/format-decimal";
 import { DeleteProductButton } from "./delete-product-button";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export default async function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const user = await getCurrentUser();
@@ -31,8 +33,11 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      <div className="rounded-lg border border-zinc-200 bg-white p-6">
-        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-semibold">Product Details</CardTitle>
+        </CardHeader>
+        <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-xs font-medium uppercase text-zinc-500">Price</dt>
             <dd className="mt-0.5 text-sm text-zinc-900">{formatDecimal(product.price)}</dd>
@@ -41,14 +46,14 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
             <dt className="text-xs font-medium uppercase text-zinc-500">Tax %</dt>
             <dd className="mt-0.5 text-sm text-zinc-900">{formatDecimal(product.taxRate)}%</dd>
           </div>
-        </dl>
-        {product.description && (
-          <div className="mt-4">
-            <dt className="text-xs font-medium uppercase text-zinc-500">Description</dt>
-            <dd className="mt-0.5 text-sm text-zinc-900">{product.description}</dd>
-          </div>
-        )}
-      </div>
+          {product.description && (
+            <div className="mt-4">
+              <dt className="text-xs font-medium uppercase text-zinc-500">Description</dt>
+              <dd className="mt-0.5 text-sm text-zinc-900">{product.description}</dd>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
   );
 }
