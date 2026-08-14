@@ -45,7 +45,7 @@ API is stable. Not part of this milestone's sprints.
 | 12a | **shadcn/ui foundation + Customers reference migration** | ��� � � ✅ Done |
 | 12b | Responsive Polish — apply pattern to remaining screens | ��� � � ✅ Done (PR #65) |
 | 13 | QA pass + Deployment prep | ��� � � ✅ Done (PR #75, PR #76) |
-| 14 | Integration/E2E test infrastructure | ���� �� �� 🔵 Next |
+| 14 | Integration/E2E test infrastructure | ��� � � ✅ Done |
 
 ---
 
