@@ -11,5 +11,17 @@ services:
     volumes:
       - quote_invoice_builder_pgdata:/var/lib/postgresql/data
 
+  # Testing & QA Spec section 7 — integration/E2E tests must never run against the
+  # dev database. Separate container, separate port, separate (ephemeral, no named
+  # volume) storage so a stale fixture never survives a restart.
+  postgres-test:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: quote_invoice_builder_test
+    ports:
+      - "5433:5432"
+
 volumes:
   quote_invoice_builder_pgdata:
