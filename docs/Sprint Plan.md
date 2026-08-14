@@ -44,8 +44,8 @@ API is stable. Not part of this milestone's sprints.
 | 11 | Dashboard (summary cards, recent documents) | ��� � � ✅ Done (PR #61) |
 | 12a | **shadcn/ui foundation + Customers reference migration** | ��� � � ✅ Done |
 | 12b | Responsive Polish — apply pattern to remaining screens | ��� � � ✅ Done (PR #65) |
-| 13 | QA pass + Deployment prep | ���� �� �� 🔵 Next |
-| — | Integration/E2E test infrastructure (backlog, unscheduled) | ���� �� �� ⬜ Backlog |
+| 13 | QA pass + Deployment prep | ��� � � ✅ Done (PR #75, PR #76) |
+| 14 | Integration/E2E test infrastructure | ��� � � ✅ Done |
 
 ---
 
@@ -201,22 +201,24 @@ Polish" (issues #62–#64):
 
 ---
 
-## Later Sprints (scope only, not yet broken into tasks)
+## Sprint 14 (current): Integration/E2E Test Infrastructure
 
-- **Sprint 12b — Responsive Polish (remaining screens)**: apply Sprint 12a's shadcn
-  pattern to Products, Quotes, Invoices, Dashboard; full responsive pass per PRD §25
-  breakpoints across all of them.
-- **Sprint 13 — QA & Deployment prep**: Testing & QA Spec, Deployment & Infrastructure
-  Spec — full pass before considering V1 shippable.
+**Goal**: test Postgres DB, Playwright, fixture factories, and the critical-flow E2E
+test — closing the gap tracked since Sprint 6 (ADR-6).
 
----
+**Docs to read first**: Testing & QA Spec §5-9, §61-65, §97; Architecture Decisions
+ADR-6.
 
-## Backlog (unscheduled)
+Full task breakdown tracked as GitHub issues under milestone "Sprint 14:
+Integration/E2E Test Infrastructure" (issues #77-#82):
 
-- **Integration/E2E test infrastructure** — test Postgres database config (separate from
-  dev DB, per Testing & QA Spec §7), Playwright setup for the critical E2E flow (§61,
-  Register → Quote → PDF → Invoice → Payment → Paid), fixture/factory functions
-  (`createTestUser()`, `createTestCustomer()`, etc. per §8-9). Currently only 110 unit
-  tests exist (mocked Prisma/auth). See Architecture Decisions ADR-6. Not assigned to a
-  sprint number yet — schedule explicitly when picked up, rather than folding into a
-  feature sprint.
+1. Test Postgres database config, separate from dev DB.
+2. Install and configure Playwright, with a smoke spec proving the harness works.
+3. Test data fixture/factory functions (`createTestUser()` etc.), with a documented
+   isolation strategy.
+4. Primary critical-flow E2E test (Register → ... → Verify Paid).
+5. Additional critical E2E scenarios: draft quote, partial payment, full payment,
+   cross-user authorization.
+6. Wire E2E into CI; update ADR-6 and this doc once it lands.
+
+**Explicitly not in this sprint**: Flutter mobile E2E (Phase 12, not started).

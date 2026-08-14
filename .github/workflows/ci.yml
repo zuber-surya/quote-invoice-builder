@@ -10,10 +10,12 @@ defaults:
   run:
     working-directory: web
 
-# Integration/E2E stages are intentionally absent — see
-# docs/Architecture Decisions.md ADR-6. This pipeline covers what
-# docs/Code & Development Workflow.md section 60 calls the minimum:
-# install -> lint -> type check -> unit tests -> build.
+# Sprint 14 added the E2E stage below (Deployment & Infrastructure Spec section 84's
+# recommended pipeline shape); see docs/Architecture Decisions.md ADR-6 for the prior
+# state and why it's now resolved. Pipeline: install -> lint -> type check -> unit
+# tests -> build -> E2E. E2E runs against a real ephemeral Postgres service container
+# — never the placeholder DATABASE_URL below, which stays valid only for `prisma
+# generate` and the unit-test/build steps that don't touch a real database.
 env:
   DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci_placeholder"
   AUTH_SECRET: "ci-placeholder-secret-not-for-real-use"
@@ -21,6 +23,20 @@ env:
 jobs:
   ci:
     runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: quote_invoice_builder_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
     steps:
       - uses: actions/checkout@v4
 
@@ -47,3 +63,29 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Apply schema to E2E test database
+        run: npx prisma db push --skip-generate
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/quote_invoice_builder_test"
+
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps chromium
+
+      - name: E2E tests
+        run: npm run test:e2e
+        env:
+          DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/quote_invoice_builder_test"
+          TEST_DATABASE_URL: "postgresql://postgres:postgres@localhost:5432/quote_invoice_builder_test"
+          AUTH_SECRET: "ci-e2e-secret-not-for-real-use"
+          AUTH_URL: "http://localhost:3100"
+          AUTH_TRUST_HOST: "true"
+          E2E_BASE_URL: "http://localhost:3100"
+
+      - name: Upload Playwright report
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: web/playwright-report/
+          retention-days: 7

@@ -299,30 +299,33 @@ export function QuoteForm({
                     </Select>
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-name`} className="text-xs font-medium text-zinc-500">
                       Name *
                     </Label>
                     <Input
+                      id={`item-${index}-name`}
                       required
                       value={item.name}
                       onChange={(e) => updateItem(index, { name: e.target.value })}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-unit`} className="text-xs font-medium text-zinc-500">
                       Unit *
                     </Label>
                     <Input
+                      id={`item-${index}-unit`}
                       required
                       value={item.unit}
                       onChange={(e) => updateItem(index, { unit: e.target.value })}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-quantity`} className="text-xs font-medium text-zinc-500">
                       Qty *
                     </Label>
                     <Input
+                      id={`item-${index}-quantity`}
                       required
                       inputMode="decimal"
                       value={item.quantity}
@@ -330,10 +333,11 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-unitPrice`} className="text-xs font-medium text-zinc-500">
                       Unit Price *
                     </Label>
                     <Input
+                      id={`item-${index}-unitPrice`}
                       required
                       inputMode="decimal"
                       value={item.unitPrice}
@@ -341,20 +345,22 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-discountAmount`} className="text-xs font-medium text-zinc-500">
                       Discount
                     </Label>
                     <Input
+                      id={`item-${index}-discountAmount`}
                       inputMode="decimal"
                       value={item.discountAmount}
                       onChange={(e) => updateItem(index, { discountAmount: e.target.value })}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-taxRate`} className="text-xs font-medium text-zinc-500">
                       Tax %
                     </Label>
                     <Input
+                      id={`item-${index}-taxRate`}
                       inputMode="decimal"
                       value={item.taxRate}
                       onChange={(e) => updateItem(index, { taxRate: e.target.value })}

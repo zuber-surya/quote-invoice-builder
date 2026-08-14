@@ -105,19 +105,43 @@ recommends.
 
 ---
 
-## ADR-6: Integration tests and E2E — deferred
+## ADR-6: Integration tests and E2E — resolved in Sprint 14
 
-**Standard**: Testing & QA Specification §5-9, §90-93 — integration tests against a real
+**Standard**: Testing & QA Specification §5-9, §61-65 — integration tests against a real
 test database, Playwright E2E for the critical flow (Register → Quote → PDF → Invoice →
 Payment → Paid).
 
-**Actual**: 110 tests exist, all unit-level — Zod schema tests and API route tests with
-`prisma`/`getCurrentUser` mocked via `vi.mock`. No test database config, no fixture
-factories (`createTestUser()` etc.), no Playwright.
+**Original state (through Sprint 13)**: 247 tests existed, all unit-level — Zod schema
+tests and API route tests with `prisma`/`getCurrentUser` mocked via `vi.mock`. No test
+database config, no fixture factories, no Playwright.
 
-**Rationale**: Meaningful new infrastructure (test DB provisioning/teardown, Playwright
-install and config, fixture factories) — sizable enough to deserve its own scoped sprint
-rather than being folded into either a feature sprint or this governance pass. Tracked as
-a backlog item in `docs/Sprint Plan.md`.
+**Original rationale for deferring**: meaningful new infrastructure (test DB
+provisioning, Playwright install and config, fixture factories) — sizable enough to
+deserve its own scoped sprint rather than being folded into either a feature sprint or
+that governance pass. Tracked as a backlog item in `docs/Sprint Plan.md`.
 
-**Revisit when**: Scheduled explicitly — see Sprint Plan.md's backlog section.
+**Resolved by Sprint 14**:
+- Test Postgres, separate from dev/production — `web/docker-compose.yml`'s
+  `postgres-test` service (local) and a `postgres:16-alpine` service container in
+  `.github/workflows/ci.yml` (CI).
+- Playwright installed and configured — `web/playwright.config.ts`, runs against a
+  production build (`next build && next start`) rather than `next dev`, since dev-mode
+  per-route compilation is slow enough to make a multi-page flow spec flaky.
+- Fixture factories — `web/e2e/fixtures/factories.ts`
+  (`createTestUser`/`createTestBusinessProfile`/`createTestCustomer`/`createTestProduct`/
+  `createTestQuote`/`createTestInvoice`/`createTestPayment`, plus `cleanupTestUser`
+  cascading through `onDelete: Cascade`). Isolation: every factory generates unique
+  data, no shared/global fixture state between tests.
+- E2E specs: `web/e2e/critical-flow.spec.ts` (primary flow, §61/§97),
+  `web/e2e/scenarios.spec.ts` (draft-quote persistence §62, cross-user authorization
+  §65). §63-64 (partial/full payment) are covered by the primary flow spec itself, not
+  duplicated separately.
+- Wired into CI as a **blocking** stage (`.github/workflows/ci.yml`) — install → lint →
+  type check → unit tests → build → E2E, per Deployment & Infrastructure Spec §84's
+  recommended shape.
+
+**Known gap not covered by this ADR's original scope**: the auth routes' error paths
+(invalid login, unknown email, etc.) are unit-tested but not E2E-tested — closed at the
+unit level in Sprint 13 (issue #74, already resolved), but no E2E spec drives the login
+form's actual error states. The scenario specs above log in via already-seeded fixture
+users rather than re-driving registration/login error cases through the UI.
