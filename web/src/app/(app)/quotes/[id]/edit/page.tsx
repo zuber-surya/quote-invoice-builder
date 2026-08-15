@@ -19,7 +19,7 @@ export default async function EditQuotePage({ params }: { params: Promise<{ id: 
 
   return (
     <div className="flex flex-1 flex-col p-8">
-      <h1 className="text-xl font-semibold text-zinc-900">Edit Quote {quote.quoteNumber}</h1>
+      <h1 className="font-heading text-2xl font-semibold text-foreground">Edit Quote {quote.quoteNumber}</h1>
       <div className="mt-6">
         <QuoteForm
           mode="edit"

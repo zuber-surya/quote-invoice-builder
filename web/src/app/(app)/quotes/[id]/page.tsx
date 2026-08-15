@@ -28,10 +28,10 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">
-            <h1 className="text-xl font-semibold text-zinc-900">{quote.quoteNumber}</h1>
+            <h1 className="text-xl font-semibold text-foreground">{quote.quoteNumber}</h1>
             <QuoteStatusBadge status={quote.status} />
           </div>
-          <p className="mt-1 text-sm text-zinc-500">{quote.customer.name}</p>
+          <p className="mt-1 text-sm text-muted-foreground">{quote.customer.name}</p>
         </div>
         <QuoteStatusActions quoteId={quote.id} status={quote.status} invoiceId={quote.invoice?.id ?? null} />
       </div>
@@ -42,18 +42,18 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-3">
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Quote Date</p>
-            <p className="mt-1 text-sm text-zinc-900">{quote.quoteDate.toISOString().slice(0, 10)}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">Quote Date</p>
+            <p className="mt-1 text-sm text-foreground">{quote.quoteDate.toISOString().slice(0, 10)}</p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Valid Until</p>
-            <p className="mt-1 text-sm text-zinc-900">
+            <p className="text-xs font-medium uppercase text-muted-foreground">Valid Until</p>
+            <p className="mt-1 text-sm text-foreground">
               {quote.expiryDate ? quote.expiryDate.toISOString().slice(0, 10) : "—"}
             </p>
           </div>
           <div>
-            <p className="text-xs font-medium uppercase text-zinc-500">Total</p>
-            <p className="mt-1 text-sm font-semibold text-zinc-900">{formatDecimal(quote.totalAmount)}</p>
+            <p className="text-xs font-medium uppercase text-muted-foreground">Total</p>
+            <p className="mt-1 font-mono text-sm font-semibold text-foreground">{formatDecimal(quote.totalAmount)}</p>
           </div>
         </CardContent>
       </Card>
@@ -63,9 +63,9 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           <CardTitle className="text-lg font-semibold">Quote Items</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto rounded-lg border border-zinc-200">
-            <table className="min-w-full divide-y divide-zinc-200 text-sm">
-              <thead className="bg-zinc-50 text-left text-xs font-medium uppercase text-zinc-500">
+          <div className="overflow-x-auto rounded-lg border border-border">
+            <table className="min-w-full divide-y divide-border text-sm">
+              <thead className="bg-muted text-left text-xs font-medium uppercase text-muted-foreground">
                 <tr>
                   <th className="px-4 py-3">Item</th>
                   <th className="px-4 py-3">Qty</th>
@@ -75,20 +75,20 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
                   <th className="px-4 py-3">Amount</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-zinc-100">
+              <tbody className="divide-y divide-border">
                 {quote.items.map((item) => (
                   <tr key={item.id}>
                     <td className="px-4 py-3">
-                      <p className="font-medium text-zinc-900">{item.name}</p>
-                      {item.description && <p className="text-xs text-zinc-500">{item.description}</p>}
+                      <p className="font-medium text-foreground">{item.name}</p>
+                      {item.description && <p className="text-xs text-muted-foreground">{item.description}</p>}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600">
+                    <td className="px-4 py-3 text-muted-foreground">
                       {formatDecimal(item.quantity, 3)} {item.unit}
                     </td>
-                    <td className="px-4 py-3 text-zinc-600">{formatDecimal(item.unitPrice)}</td>
-                    <td className="px-4 py-3 text-zinc-600">{formatDecimal(item.discountAmount)}</td>
-                    <td className="px-4 py-3 text-zinc-600">{formatDecimal(item.taxRate)}%</td>
-                    <td className="px-4 py-3 text-zinc-600">{formatDecimal(item.lineTotal)}</td>
+                    <td className="px-4 py-3 font-mono text-muted-foreground">{formatDecimal(item.unitPrice)}</td>
+                    <td className="px-4 py-3 font-mono text-muted-foreground">{formatDecimal(item.discountAmount)}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{formatDecimal(item.taxRate)}%</td>
+                    <td className="px-4 py-3 font-mono text-muted-foreground">{formatDecimal(item.lineTotal)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -104,20 +104,20 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
         <CardContent>
           <dl className="flex w-full max-w-xs flex-col gap-2 text-sm sm:w-72">
             <div className="flex justify-between">
-              <dt className="text-zinc-500">Subtotal</dt>
-              <dd className="text-zinc-900">{formatDecimal(quote.subtotal)}</dd>
+              <dt className="text-muted-foreground">Subtotal</dt>
+              <dd className="font-mono text-foreground">{formatDecimal(quote.subtotal)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-zinc-500">Discount</dt>
-              <dd className="text-zinc-900">{formatDecimal(quote.discountAmount)}</dd>
+              <dt className="text-muted-foreground">Discount</dt>
+              <dd className="font-mono text-foreground">{formatDecimal(quote.discountAmount)}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-zinc-500">Tax</dt>
-              <dd className="text-zinc-900">{formatDecimal(quote.taxAmount)}</dd>
+              <dt className="text-muted-foreground">Tax</dt>
+              <dd className="font-mono text-foreground">{formatDecimal(quote.taxAmount)}</dd>
             </div>
-            <div className="flex justify-between border-t border-zinc-200 pt-2 font-semibold">
-              <dt className="text-zinc-900">Total</dt>
-              <dd className="text-zinc-900">{formatDecimal(quote.totalAmount)}</dd>
+            <div className="flex justify-between border-t border-border pt-2 font-semibold">
+              <dt className="text-foreground">Total</dt>
+              <dd className="font-mono text-foreground">{formatDecimal(quote.totalAmount)}</dd>
             </div>
           </dl>
         </CardContent>
@@ -131,14 +131,14 @@ export default async function QuoteDetailPage({ params }: { params: Promise<{ id
           <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {quote.notes && (
               <div>
-                <p className="text-xs font-medium uppercase text-zinc-500">Notes</p>
-                <p className="mt-1 text-sm text-zinc-900">{quote.notes}</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">Notes</p>
+                <p className="mt-1 text-sm text-foreground">{quote.notes}</p>
               </div>
             )}
             {quote.terms && (
               <div>
-                <p className="text-xs font-medium uppercase text-zinc-500">Terms</p>
-                <p className="mt-1 text-sm text-zinc-900">{quote.terms}</p>
+                <p className="text-xs font-medium uppercase text-muted-foreground">Terms</p>
+                <p className="mt-1 text-sm text-foreground">{quote.terms}</p>
               </div>
             )}
           </CardContent>

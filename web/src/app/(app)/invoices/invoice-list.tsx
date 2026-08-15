@@ -12,14 +12,15 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
-import { QuoteStatusBadge } from "./quote-status-badge";
+import { InvoiceStatusBadge } from "./invoice-status-badge";
 
-type QuoteRow = {
+type InvoiceRow = {
   id: string;
-  quoteNumber: string;
-  quoteDate: string;
+  invoiceNumber: string;
+  invoiceDate: string;
   status: string;
   totalAmount: string;
+  remainingAmount: string;
   customer: { id: string; name: string } | null;
 };
 
@@ -27,20 +28,28 @@ type CustomerOption = { id: string; name: string };
 
 type ListResponse = {
   success: boolean;
-  data: QuoteRow[];
+  data: InvoiceRow[];
   meta: { page: number; pageSize: number; total: number; totalPages: number };
 };
 
-const STATUS_OPTIONS = ["DRAFT", "SENT", "ACCEPTED", "REJECTED", "EXPIRED"];
+const STATUS_OPTIONS = ["DRAFT", "UNPAID", "PARTIALLY_PAID", "PAID"];
 const ALL_STATUSES = "ALL";
 const ALL_CUSTOMERS = "ALL";
+const STATUS_LABELS: Record<string, string> = {
+  DRAFT: "Draft",
+  UNPAID: "Unpaid",
+  PARTIALLY_PAID: "Partially Paid",
+  PAID: "Paid",
+};
 
-export function QuoteList() {
+// Mirrors quotes/quote-list.tsx — same filter/search/pagination shape against
+// GET /api/v1/invoices (docs/API Specification.md section 43).
+export function InvoiceList() {
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("");
   const [customerId, setCustomerId] = useState("");
   const [page, setPage] = useState(1);
-  const [rows, setRows] = useState<QuoteRow[]>([]);
+  const [rows, setRows] = useState<InvoiceRow[]>([]);
   const [meta, setMeta] = useState<ListResponse["meta"] | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,18 +75,18 @@ export function QuoteList() {
     if (customerId) params.set("customerId", customerId);
 
     const timeout = setTimeout(() => {
-      fetch(`/api/v1/quotes?${params.toString()}`, { signal: controller.signal })
+      fetch(`/api/v1/invoices?${params.toString()}`, { signal: controller.signal })
         .then((res) => res.json())
         .then((result: ListResponse) => {
           if (!result.success) {
-            setError("Unable to load quotes. Please check your connection and try again.");
+            setError("Unable to load invoices. Please check your connection and try again.");
             return;
           }
           setRows(result.data);
           setMeta(result.meta);
         })
         .catch(() => {
-          if (!controller.signal.aborted) setError("Unable to load quotes. Please check your connection and try again.");
+          if (!controller.signal.aborted) setError("Unable to load invoices. Please check your connection and try again.");
         })
         .finally(() => {
           if (!controller.signal.aborted) setLoading(false);
@@ -98,7 +107,7 @@ export function QuoteList() {
         <div className="flex flex-wrap items-center gap-2">
           <Input
             type="search"
-            placeholder="Search by quote number or customer"
+            placeholder="Search by invoice number or customer"
             value={search}
             onChange={(e) => {
               setPage(1);
@@ -119,7 +128,7 @@ export function QuoteList() {
               <SelectItem value={ALL_STATUSES}>All statuses</SelectItem>
               {STATUS_OPTIONS.map((s) => (
                 <SelectItem key={s} value={s}>
-                  {s.charAt(0) + s.slice(1).toLowerCase()}
+                  {STATUS_LABELS[s]}
                 </SelectItem>
               ))}
             </SelectContent>
@@ -144,53 +153,55 @@ export function QuoteList() {
             </SelectContent>
           </Select>
         </div>
-        <Link href="/quotes/new">
-          <Button variant="default">+ Create Quote</Button>
+        <Link href="/invoices/new">
+          <Button variant="default">+ Create Invoice</Button>
         </Link>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {/* Responsive container: table on desktop, cards on mobile */}
-      <div className="hidden md:block overflow-x-auto rounded-lg border border-zinc-200">
+      <div className="hidden md:block overflow-x-auto rounded-lg border border-border">
         {/* Desktop: Table view */}
-        <Table className="min-w-full divide-y divide-zinc-200 text-sm">
+        <Table className="min-w-full divide-y divide-border text-sm">
           <TableHeader>
-            <TableRow className="bg-zinc-50 text-left text-xs font-medium uppercase text-zinc-500">
-              <TableHead className="px-4 py-3">Quote</TableHead>
+            <TableRow className="bg-muted text-left text-xs font-medium uppercase text-muted-foreground">
+              <TableHead className="px-4 py-3">Invoice</TableHead>
               <TableHead className="px-4 py-3">Customer</TableHead>
               <TableHead className="px-4 py-3">Date</TableHead>
               <TableHead className="px-4 py-3">Amount</TableHead>
+              <TableHead className="px-4 py-3">Remaining</TableHead>
               <TableHead className="px-4 py-3">Status</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {!loading && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={5} className="px-4 py-10 text-center">
+                <TableCell colSpan={6} className="px-4 py-10 text-center">
                   {hasFilters ? (
-                    <span className="text-zinc-500">No quotes match your filters.</span>
+                    <span className="text-muted-foreground">No invoices match your filters.</span>
                   ) : (
                     <div className="flex flex-col items-center gap-2">
-                      <p className="font-medium text-zinc-900">No quotes yet</p>
-                      <p className="text-zinc-500">Create your first quote.</p>
+                      <p className="font-medium text-foreground">No invoices yet</p>
+                      <p className="text-muted-foreground">Create your first invoice, or convert an accepted quote.</p>
                     </div>
                   )}
                 </TableCell>
               </TableRow>
             )}
-            {rows.map((quote) => (
-              <TableRow key={quote.id} className="hover:bg-zinc-50">
+            {rows.map((invoice) => (
+              <TableRow key={invoice.id} className="hover:bg-muted">
                 <TableCell className="px-4 py-3">
-                  <Link href={`/quotes/${quote.id}`} className="font-medium text-zinc-900 hover:underline">
-                    {quote.quoteNumber}
+                  <Link href={`/invoices/${invoice.id}`} className="font-medium text-foreground hover:underline">
+                    {invoice.invoiceNumber}
                   </Link>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{quote.customer?.name ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{quote.quoteDate}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{quote.totalAmount}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{invoice.customer?.name ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{invoice.invoiceDate}</TableCell>
+                <TableCell className="px-4 py-3 font-mono text-foreground">{invoice.totalAmount}</TableCell>
+                <TableCell className="px-4 py-3 font-mono text-foreground">{invoice.remainingAmount}</TableCell>
                 <TableCell className="px-4 py-3">
-                  <QuoteStatusBadge status={quote.status} />
+                  <InvoiceStatusBadge status={invoice.status} />
                 </TableCell>
               </TableRow>
             ))}
@@ -199,9 +210,9 @@ export function QuoteList() {
 
         {/* Desktop-only pagination */}
         {meta && meta.totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between text-sm text-zinc-600">
+          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
             <span>
-              Page {meta.page} of {meta.totalPages} ({meta.total} quotes)
+              Page {meta.page} of {meta.totalPages} ({meta.total} invoices)
             </span>
             <div className="flex gap-2">
               <Button
@@ -235,34 +246,35 @@ export function QuoteList() {
         {/* Mobile: Card view */}
         <div className="space-y-4">
           {!loading && rows.length === 0 ? (
-            <div className="text-center text-zinc-500 py-8">
+            <div className="text-center text-muted-foreground py-8">
               {hasFilters ? (
-                <span className="text-zinc-500">No quotes match your filters.</span>
+                <span className="text-muted-foreground">No invoices match your filters.</span>
               ) : (
                 <div className="flex flex-col items-center gap-2">
-                  <p className="font-medium text-zinc-900">No quotes yet</p>
-                  <p className="text-zinc-500">Create your first quote.</p>
+                  <p className="font-medium text-foreground">No invoices yet</p>
+                  <p className="text-muted-foreground">Create your first invoice, or convert an accepted quote.</p>
                 </div>
               )}
             </div>
           ) : (
             <>
-              {rows.map((quote) => (
+              {rows.map((invoice) => (
                 <Link
-                  key={quote.id}
-                  href={`/quotes/${quote.id}`}
-                  className="block rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors hover:shadow-md"
+                  key={invoice.id}
+                  href={`/invoices/${invoice.id}`}
+                  className="block rounded-lg border border-border hover:bg-muted transition-colors hover:shadow-md"
                 >
                   <div className="p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-medium text-zinc-900">{quote.quoteNumber}</h3>
-                        <p className="text-sm text-zinc-500">{quote.customer?.name ?? "—"}</p>
+                        <h3 className="font-medium text-foreground">{invoice.invoiceNumber}</h3>
+                        <p className="text-sm text-muted-foreground">{invoice.customer?.name ?? "—"}</p>
                       </div>
                       <div className="text-right text-sm space-y-1">
-                        <div className="text-zinc-600">{quote.totalAmount}</div>
-                        <div className="text-zinc-600">
-                          <QuoteStatusBadge status={quote.status} className="ml-2" />
+                        <div className="font-mono text-foreground">{invoice.totalAmount}</div>
+                        <div className="font-mono text-muted-foreground">{invoice.remainingAmount}</div>
+                        <div className="text-muted-foreground">
+                          <InvoiceStatusBadge status={invoice.status} className="ml-2" />
                         </div>
                       </div>
                     </div>

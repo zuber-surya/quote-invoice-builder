@@ -79,7 +79,7 @@ export function InvoiceStatusActions({ invoiceId, status }: { invoiceId: string;
       )}
 
       {error && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-destructive">
           {error}
         </p>
       )}

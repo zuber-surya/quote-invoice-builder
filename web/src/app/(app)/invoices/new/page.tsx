@@ -9,7 +9,7 @@ export default async function NewInvoicePage() {
 
   return (
     <div className="flex flex-1 flex-col p-8">
-      <h1 className="text-xl font-semibold text-zinc-900">Create Invoice</h1>
+      <h1 className="font-heading text-2xl font-semibold text-foreground">Create Invoice</h1>
       <div className="mt-6">
         <InvoiceForm mode="create" />
       </div>

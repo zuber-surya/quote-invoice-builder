@@ -40,7 +40,7 @@ export function RecordPaymentForm({ invoiceId, onClose }: { invoiceId: string; o
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex flex-col gap-3 rounded-lg border border-zinc-200 bg-zinc-50 p-4 sm:flex-row sm:items-end sm:flex-wrap"
+      className="flex flex-col gap-3 rounded-lg border border-border bg-muted p-4 sm:flex-row sm:items-end sm:flex-wrap"
     >
       <div className="flex flex-col gap-1">
         <Label htmlFor="payment-amount">
@@ -92,7 +92,7 @@ export function RecordPaymentForm({ invoiceId, onClose }: { invoiceId: string; o
         </Button>
       </div>
       {error && (
-        <p role="alert" className="w-full text-sm text-red-600">
+        <p role="alert" className="w-full text-sm text-destructive">
           {error}
         </p>
       )}

@@ -20,7 +20,7 @@ export default async function EditInvoicePage({ params }: { params: Promise<{ id
 
   return (
     <div className="flex flex-1 flex-col p-8">
-      <h1 className="text-xl font-semibold text-zinc-900">Edit Invoice {invoice.invoiceNumber}</h1>
+      <h1 className="font-heading text-2xl font-semibold text-foreground">Edit Invoice {invoice.invoiceNumber}</h1>
       <div className="mt-6">
         <InvoiceForm
           mode="edit"

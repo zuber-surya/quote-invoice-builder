@@ -263,7 +263,7 @@ export function QuoteForm({
 
         <div className="flex flex-col gap-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-medium text-zinc-700">Items</h2>
+            <h2 className="text-sm font-medium text-foreground">Items</h2>
             <Button
               type="button"
               onClick={addItem}
@@ -276,10 +276,10 @@ export function QuoteForm({
 
           <div className="flex flex-col gap-3">
             {values.items.map((item, index) => (
-              <div key={index} className="rounded-lg border border-zinc-200 p-4">
+              <div key={index} className="rounded-lg border border-border p-4">
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-6">
                   <div className="flex flex-col gap-1 sm:col-span-2">
-                    <Label className="text-xs font-medium text-zinc-500">
+                    <Label className="text-xs font-medium text-muted-foreground">
                       Product / Service
                     </Label>
                     <Select
@@ -299,7 +299,7 @@ export function QuoteForm({
                     </Select>
                   </div>
                   <div className="flex flex-col gap-1 sm:col-span-2">
-                    <Label htmlFor={`item-${index}-name`} className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-name`} className="text-xs font-medium text-muted-foreground">
                       Name *
                     </Label>
                     <Input
@@ -310,7 +310,7 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label htmlFor={`item-${index}-unit`} className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-unit`} className="text-xs font-medium text-muted-foreground">
                       Unit *
                     </Label>
                     <Input
@@ -321,7 +321,7 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label htmlFor={`item-${index}-quantity`} className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-quantity`} className="text-xs font-medium text-muted-foreground">
                       Qty *
                     </Label>
                     <Input
@@ -333,7 +333,7 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label htmlFor={`item-${index}-unitPrice`} className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-unitPrice`} className="text-xs font-medium text-muted-foreground">
                       Unit Price *
                     </Label>
                     <Input
@@ -345,7 +345,7 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label htmlFor={`item-${index}-discountAmount`} className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-discountAmount`} className="text-xs font-medium text-muted-foreground">
                       Discount
                     </Label>
                     <Input
@@ -356,7 +356,7 @@ export function QuoteForm({
                     />
                   </div>
                   <div className="flex flex-col gap-1">
-                    <Label htmlFor={`item-${index}-taxRate`} className="text-xs font-medium text-zinc-500">
+                    <Label htmlFor={`item-${index}-taxRate`} className="text-xs font-medium text-muted-foreground">
                       Tax %
                     </Label>
                     <Input
@@ -420,25 +420,25 @@ export function QuoteForm({
         )}
       </div>
 
-      <div className="h-fit rounded-lg border border-zinc-200 bg-zinc-50 p-5">
-        <h2 className="text-sm font-medium text-zinc-700">Summary</h2>
-        <p className="mt-1 text-xs text-zinc-500">Preview only — final totals are calculated on save.</p>
+      <div className="h-fit rounded-lg border border-border bg-muted p-5">
+        <h2 className="text-sm font-medium text-foreground">Summary</h2>
+        <p className="mt-1 text-xs text-muted-foreground">Preview only — final totals are calculated on save.</p>
         <dl className="mt-4 flex flex-col gap-2 text-sm">
           <div className="flex justify-between">
-            <dt className="text-zinc-500">Subtotal</dt>
-            <dd className="text-zinc-900">{money(totals.subtotal)}</dd>
+            <dt className="text-muted-foreground">Subtotal</dt>
+            <dd className="font-mono text-foreground">{money(totals.subtotal)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-zinc-500">Discount</dt>
-            <dd className="text-zinc-900">{money(totals.discountAmount)}</dd>
+            <dt className="text-muted-foreground">Discount</dt>
+            <dd className="font-mono text-foreground">{money(totals.discountAmount)}</dd>
           </div>
           <div className="flex justify-between">
-            <dt className="text-zinc-500">Tax</dt>
-            <dd className="text-zinc-900">{money(totals.taxAmount)}</dd>
+            <dt className="text-muted-foreground">Tax</dt>
+            <dd className="font-mono text-foreground">{money(totals.taxAmount)}</dd>
           </div>
-          <div className="flex justify-between border-t border-zinc-200 pt-2 font-semibold">
-            <dt className="text-zinc-900">Total</dt>
-            <dd className="text-zinc-900">{money(totals.totalAmount)}</dd>
+          <div className="flex justify-between border-t border-border pt-2 font-semibold">
+            <dt className="text-foreground">Total</dt>
+            <dd className="font-mono text-foreground">{money(totals.totalAmount)}</dd>
           </div>
         </dl>
 
