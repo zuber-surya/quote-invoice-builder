@@ -2,6 +2,9 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 type BusinessProfileFormValues = {
   businessName: string;
@@ -52,18 +55,17 @@ function Field({
 }) {
   return (
     <div className="flex flex-col gap-1">
-      <label htmlFor={name} className="text-sm font-medium text-zinc-700">
+      <Label htmlFor={name}>
         {label}
         {required ? " *" : ""}
-      </label>
-      <input
+      </Label>
+      <Input
         id={name}
         name={name}
         type={type}
         required={required}
         value={value}
         onChange={(e) => onChange(name, e.target.value)}
-        className="rounded-md border border-zinc-300 px-3 py-2 text-sm outline-none focus:border-zinc-500 focus:ring-1 focus:ring-zinc-500"
       />
     </div>
   );
@@ -135,7 +137,7 @@ export function BusinessProfileForm({
       </div>
 
       {Object.keys(fieldErrors).length > 0 && (
-        <ul className="text-sm text-red-600">
+        <ul className="text-sm text-destructive">
           {Object.entries(fieldErrors).map(([field, message]) => (
             <li key={field}>{message}</li>
           ))}
@@ -143,18 +145,14 @@ export function BusinessProfileForm({
       )}
 
       {formError && (
-        <p role="alert" className="text-sm text-red-600">
+        <p role="alert" className="text-sm text-destructive">
           {formError}
         </p>
       )}
 
-      <button
-        type="submit"
-        disabled={saving}
-        className="w-fit rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white hover:bg-zinc-800 disabled:opacity-60"
-      >
+      <Button type="submit" disabled={saving} className="w-fit">
         {saving ? "Saving…" : isFirstTimeSetup ? "Save & Continue" : "Save Changes"}
-      </button>
+      </Button>
     </form>
   );
 }
