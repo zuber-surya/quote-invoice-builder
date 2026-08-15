@@ -19,16 +19,13 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
     <div className="flex flex-1 flex-col gap-6 p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">{product.name}</h1>
-          <p className="mt-1 text-sm text-zinc-500">{product.unit}</p>
+          <h1 className="font-heading text-2xl font-semibold text-foreground">{product.name}</h1>
+          <p className="mt-1 text-sm text-muted-foreground">{product.unit}</p>
         </div>
         <div className="flex gap-2">
-          <Link
-            href={`/products/${product.id}/edit`}
-            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
-          >
-            Edit
-          </Link>
+          <Button asChild variant="outline">
+            <Link href={`/products/${product.id}/edit`}>Edit</Link>
+          </Button>
           <DeleteProductButton productId={product.id} />
         </div>
       </div>
@@ -39,17 +36,17 @@ export default async function ProductDetailPage({ params }: { params: Promise<{ 
         </CardHeader>
         <CardContent className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
-            <dt className="text-xs font-medium uppercase text-zinc-500">Price</dt>
-            <dd className="mt-0.5 text-sm text-zinc-900">{formatDecimal(product.price)}</dd>
+            <dt className="text-xs font-medium uppercase text-muted-foreground">Price</dt>
+            <dd className="mt-0.5 font-mono text-sm text-foreground">{formatDecimal(product.price)}</dd>
           </div>
           <div>
-            <dt className="text-xs font-medium uppercase text-zinc-500">Tax %</dt>
-            <dd className="mt-0.5 text-sm text-zinc-900">{formatDecimal(product.taxRate)}%</dd>
+            <dt className="text-xs font-medium uppercase text-muted-foreground">Tax %</dt>
+            <dd className="mt-0.5 font-mono text-sm text-foreground">{formatDecimal(product.taxRate)}%</dd>
           </div>
           {product.description && (
             <div className="mt-4">
-              <dt className="text-xs font-medium uppercase text-zinc-500">Description</dt>
-              <dd className="mt-0.5 text-sm text-zinc-900">{product.description}</dd>
+              <dt className="text-xs font-medium uppercase text-muted-foreground">Description</dt>
+              <dd className="mt-0.5 text-sm text-foreground">{product.description}</dd>
             </div>
           )}
         </CardContent>

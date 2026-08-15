@@ -10,8 +10,8 @@ export default async function CustomersPage() {
   return (
     <div className="flex flex-1 flex-col gap-6 p-8">
       <div>
-        <h1 className="text-xl font-semibold text-zinc-900">Customers</h1>
-        <p className="mt-1 text-sm text-zinc-500">Manage the customers you send quotes and invoices to.</p>
+        <h1 className="font-heading text-2xl font-semibold text-foreground">Customers</h1>
+        <p className="mt-1 text-sm text-muted-foreground">Manage the customers you send quotes and invoices to.</p>
       </div>
       <CustomerList />
     </div>

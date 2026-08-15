@@ -9,8 +9,8 @@ import { Button } from "@/components/ui/button";
 function DetailRow({ label, value }: { label: string; value: string | null }) {
   return (
     <div>
-      <dt className="text-xs font-medium uppercase text-zinc-500">{label}</dt>
-      <dd className="mt-0.5 text-sm text-zinc-900">{value || "—"}</dd>
+      <dt className="text-xs font-medium uppercase text-muted-foreground">{label}</dt>
+      <dd className="mt-0.5 text-sm text-foreground">{value || "—"}</dd>
     </div>
   );
 }
@@ -30,16 +30,13 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
     <div className="flex flex-1 flex-col gap-6 p-8">
       <div className="flex flex-wrap items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-semibold text-zinc-900">{customer.name}</h1>
-          {customer.companyName && <p className="mt-1 text-sm text-zinc-500">{customer.companyName}</p>}
+          <h1 className="font-heading text-2xl font-semibold text-foreground">{customer.name}</h1>
+          {customer.companyName && <p className="mt-1 text-sm text-muted-foreground">{customer.companyName}</p>}
         </div>
         <div className="flex gap-2">
-          <Link
-            href={`/customers/${customer.id}/edit`}
-            className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 hover:bg-zinc-50"
-          >
-            Edit
-          </Link>
+          <Button asChild variant="outline">
+            <Link href={`/customers/${customer.id}/edit`}>Edit</Link>
+          </Button>
           <DeleteCustomerButton customerId={customer.id} />
         </div>
       </div>
@@ -77,9 +74,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <CardTitle className="text-lg font-semibold">Quotes</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center py-8">
-            <p className="mt-1 text-2xl font-semibold text-zinc-900">{customer._count.quotes}</p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">{customer._count.quotes}</p>
             {customer._count.quotes === 0 && (
-              <p className="mt-1 text-sm text-zinc-500">Quote management isn&apos;t available yet.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Quote management isn&apos;t available yet.</p>
             )}
           </CardContent>
         </Card>
@@ -88,9 +85,9 @@ export default async function CustomerDetailPage({ params }: { params: Promise<{
             <CardTitle className="text-lg font-semibold">Invoices</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center py-8">
-            <p className="mt-1 text-2xl font-semibold text-zinc-900">{customer._count.invoices}</p>
+            <p className="mt-1 text-2xl font-semibold text-foreground">{customer._count.invoices}</p>
             {customer._count.invoices === 0 && (
-              <p className="mt-1 text-sm text-zinc-500">Invoice management isn&apos;t available yet.</p>
+              <p className="mt-1 text-sm text-muted-foreground">Invoice management isn&apos;t available yet.</p>
             )}
           </CardContent>
         </Card>

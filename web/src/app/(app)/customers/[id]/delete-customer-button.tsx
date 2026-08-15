@@ -4,28 +4,28 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 
-export function DeleteProductButton({ productId }: { productId: string }) {
+export function DeleteCustomerButton({ customerId }: { customerId: string }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [deleting, setDeleting] = useState(false);
 
   async function handleDelete() {
-    if (!confirm("Delete this product? This cannot be undone.")) return;
+    if (!confirm("Delete this customer? This cannot be undone.")) return;
 
     setDeleting(true);
     setError(null);
 
     try {
-      const response = await fetch(`/api/v1/products/${productId}`, { method: "DELETE" });
+      const response = await fetch(`/api/v1/customers/${customerId}`, { method: "DELETE" });
       const result = await response.json().catch(() => null);
       setDeleting(false);
 
       if (!response.ok || !result?.success) {
-        setError(result?.error?.message ?? "Unable to delete product. Please try again.");
+        setError(result?.error?.message ?? "Unable to delete customer. Please try again.");
         return;
       }
 
-      router.push("/products");
+      router.push("/customers");
       router.refresh();
     } catch (error) {
       setDeleting(false);
@@ -42,7 +42,7 @@ export function DeleteProductButton({ productId }: { productId: string }) {
       >
         {deleting ? "Deleting…" : "Delete"}
       </Button>
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </div>
   );
 }

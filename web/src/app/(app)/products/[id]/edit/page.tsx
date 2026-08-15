@@ -13,9 +13,9 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
   if (!product) notFound();
 
   return (
-    <div className="flex flex-1 justify-center bg-zinc-50 px-4 py-10">
-      <div className="w-full max-w-2xl rounded-lg border border-zinc-200 bg-white p-8 shadow-sm">
-        <h1 className="text-xl font-semibold text-zinc-900">Edit Product</h1>
+    <div className="flex flex-1 justify-center bg-background px-4 py-10">
+      <div className="w-full max-w-2xl rounded-lg border border-border bg-card p-8">
+        <h1 className="font-heading text-2xl font-semibold text-foreground">Edit Product</h1>
         <ProductForm
           mode="edit"
           productId={product.id}

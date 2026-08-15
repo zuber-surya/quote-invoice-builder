@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { Mail, Phone } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
@@ -82,14 +83,14 @@ export function CustomerList() {
         </div>
       </div>
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-destructive">{error}</p>}
 
       {/* Responsive container: table on desktop, cards on mobile */}
-      <div className="hidden md:block overflow-x-auto rounded-lg border border-zinc-200">
+      <div className="hidden md:block overflow-x-auto rounded-lg border border-border">
         {/* Desktop: Table view */}
-        <Table className="min-w-full divide-y divide-zinc-200 text-sm">
+        <Table className="min-w-full divide-y divide-border text-sm">
           <TableHeader>
-            <TableRow className="bg-zinc-50 text-left text-xs font-medium uppercase text-zinc-500">
+            <TableRow className="bg-muted text-left text-xs font-medium uppercase text-muted-foreground">
               <TableHead className="px-4 py-3">Name</TableHead>
               <TableHead className="px-4 py-3">Company</TableHead>
               <TableHead className="px-4 py-3">Email</TableHead>
@@ -101,23 +102,23 @@ export function CustomerList() {
           <TableBody>
             {!loading && rows.length === 0 && (
               <TableRow>
-                <TableCell colSpan={6} className="px-4 py-6 text-center text-zinc-500">
+                <TableCell colSpan={6} className="px-4 py-6 text-center text-muted-foreground">
                   {search ? "No customers match your search." : "No customers yet. Add your first one."}
                 </TableCell>
               </TableRow>
             )}
             {rows.map((customer) => (
-              <TableRow key={customer.id} className="hover:bg-zinc-50">
+              <TableRow key={customer.id} className="hover:bg-muted">
                 <TableCell className="px-4 py-3">
-                  <Link href={`/customers/${customer.id}`} className="font-medium text-zinc-900 hover:underline">
+                  <Link href={`/customers/${customer.id}`} className="font-medium text-foreground hover:underline">
                     {customer.name}
                   </Link>
                 </TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{customer.companyName ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{customer.email ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{customer.phone ?? "—"}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{customer.quoteCount}</TableCell>
-                <TableCell className="px-4 py-3 text-zinc-600">{customer.invoiceCount}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{customer.companyName ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{customer.email ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{customer.phone ?? "—"}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{customer.quoteCount}</TableCell>
+                <TableCell className="px-4 py-3 text-muted-foreground">{customer.invoiceCount}</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -125,7 +126,7 @@ export function CustomerList() {
 
         {/* Desktop-only pagination */}
         {meta && meta.totalPages > 1 && (
-          <div className="mt-4 flex items-center justify-between text-sm text-zinc-600">
+          <div className="mt-4 flex items-center justify-between text-sm text-muted-foreground">
             <span>
               Page {meta.page} of {meta.totalPages} ({meta.total} customers)
             </span>
@@ -161,7 +162,7 @@ export function CustomerList() {
         {/* Mobile: Card view */}
         <div className="space-y-4">
           {!loading && rows.length === 0 ? (
-            <p className="text-center text-zinc-500 py-8">
+            <p className="text-center text-muted-foreground py-8">
               {search ? "No customers match your search." : "No customers yet. Add your first one."}
             </p>
           ) : (
@@ -170,34 +171,34 @@ export function CustomerList() {
                 <Link
                   key={customer.id}
                   href={`/customers/${customer.id}`}
-                  className="block rounded-lg border border-zinc-200 hover:bg-zinc-50 transition-colors hover:shadow-md"
+                  className="block rounded-lg border border-border hover:bg-muted transition-colors hover:shadow-md"
                 >
                   <div className="p-4">
                     <div className="flex items-start justify-between">
                       <div>
-                        <h3 className="font-medium text-zinc-900">{customer.name}</h3>
+                        <h3 className="font-medium text-foreground">{customer.name}</h3>
                         {customer.companyName && (
-                          <p className="mt-1 text-sm text-zinc-600">{customer.companyName}</p>
+                          <p className="mt-1 text-sm text-muted-foreground">{customer.companyName}</p>
                         )}
                       </div>
                       <div className="text-right text-sm space-y-1">
-                        <div className="text-zinc-600">Quotes: <span className="font-medium">{customer.quoteCount}</span></div>
-                        <div className="text-zinc-600">Invoices: <span className="font-medium">{customer.invoiceCount}</span></div>
+                        <div className="text-muted-foreground">Quotes: <span className="font-medium text-foreground">{customer.quoteCount}</span></div>
+                        <div className="text-muted-foreground">Invoices: <span className="font-medium text-foreground">{customer.invoiceCount}</span></div>
                       </div>
                     </div>
                     {customer.email || customer.phone ? (
-                      <div className="mt-2 text-sm text-zinc-600 space-y-1">
+                      <div className="mt-2 flex flex-col gap-1 text-sm text-muted-foreground">
                         {customer.email && (
-                          <>
-                            <span className="mr-2">���������������������������������������������📧</span>
+                          <span className="flex items-center gap-1.5">
+                            <Mail className="size-3.5 shrink-0" />
                             {customer.email}
-                          </>
+                          </span>
                         )}
                         {customer.phone && (
-                          <>
-                            <span className="mr-2">���������������������������������������������📱</span>
+                          <span className="flex items-center gap-1.5">
+                            <Phone className="size-3.5 shrink-0" />
                             {customer.phone}
-                          </>
+                          </span>
                         )}
                       </div>
                     ) : null}
