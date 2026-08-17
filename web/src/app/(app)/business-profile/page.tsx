@@ -41,6 +41,18 @@ export default async function BusinessProfilePage() {
             taxNumber: profile?.taxNumber ?? "",
             website: profile?.website ?? "",
             currency: profile?.currency ?? "INR",
+            bankAccountName: profile?.bankAccountName ?? "",
+            bankName: profile?.bankName ?? "",
+            bankAccountNumber: profile?.bankAccountNumber ?? "",
+            ifscCode: profile?.ifscCode ?? "",
+            swiftBicCode: profile?.swiftBicCode ?? "",
+            lutNumber: profile?.lutNumber ?? "",
+            lutDate: profile?.lutDate ? profile.lutDate.toISOString().slice(0, 10) : "",
+            pdfShowQuantity: profile?.pdfShowQuantity ?? true,
+            pdfShowUnitPrice: profile?.pdfShowUnitPrice ?? true,
+            pdfShowDiscount: profile?.pdfShowDiscount ?? true,
+            pdfShowTax: profile?.pdfShowTax ?? true,
+            pdfShowSacCode: profile?.pdfShowSacCode ?? false,
           }}
         />
       </div>

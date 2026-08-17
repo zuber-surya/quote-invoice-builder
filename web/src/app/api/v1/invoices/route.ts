@@ -123,6 +123,7 @@ export async function POST(request: Request) {
                 name: input.items[index].name,
                 description: input.items[index].description,
                 unit: input.items[index].unit,
+                sacCode: input.items[index].sacCode,
                 quantity: item.quantity,
                 unitPrice: item.unitPrice,
                 discountAmount: item.discountAmount,

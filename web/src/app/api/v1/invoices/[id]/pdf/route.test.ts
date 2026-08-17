@@ -64,6 +64,19 @@ const businessProfile = {
   email: null,
   phone: null,
   taxNumber: null,
+  bankAccountName: null,
+  bankName: null,
+  bankAccountNumber: null,
+  ifscCode: null,
+  swiftBicCode: null,
+  lutNumber: null,
+  lutDate: null,
+  pdfShowQuantity: true,
+  pdfShowUnitPrice: true,
+  pdfShowDiscount: true,
+  pdfShowTax: true,
+  pdfShowSacCode: false,
+  currency: "USD",
 };
 
 beforeEach(() => {
@@ -123,6 +136,34 @@ describe("GET /api/v1/invoices/:id/pdf", () => {
 
     expect(generateInvoicePdf).toHaveBeenCalledWith(
       expect.objectContaining({ status: "PARTIALLY_PAID", paidAmount: "40.00", remainingAmount: "60.00" })
+    );
+  });
+
+  it("passes bank details, LUT, and PDF column settings through to the renderer", async () => {
+    vi.mocked(getCurrentUser).mockResolvedValue(user);
+    vi.mocked(prisma.invoice.findFirst).mockResolvedValue(invoice as never);
+    vi.mocked(prisma.businessProfile.findUnique).mockResolvedValue({
+      ...businessProfile,
+      bankAccountName: "Gajjar Ankit",
+      bankName: "ICICI Bank",
+      lutNumber: "AD2404260069519",
+      lutDate: new Date("2026-04-02"),
+      pdfShowSacCode: true,
+    } as never);
+    vi.mocked(generateInvoicePdf).mockResolvedValue(Buffer.from("%PDF-1.7 fake"));
+
+    await GET(new Request("http://localhost"), params());
+
+    expect(generateInvoicePdf).toHaveBeenCalledWith(
+      expect.objectContaining({
+        business: expect.objectContaining({
+          bankAccountName: "Gajjar Ankit",
+          bankName: "ICICI Bank",
+          lutNumber: "AD2404260069519",
+          lutDate: "2026-04-02",
+          pdfShowSacCode: true,
+        }),
+      })
     );
   });
 

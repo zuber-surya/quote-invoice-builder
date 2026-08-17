@@ -23,6 +23,7 @@ export const productSchema = z.object({
   unit: z.string().trim().min(1, "Unit is required").max(50),
   price: priceString,
   taxRate: taxRateString,
+  sacCode: optionalString(50),
 });
 
 export type ProductInput = z.infer<typeof productSchema>;

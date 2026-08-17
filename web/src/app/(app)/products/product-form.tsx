@@ -13,6 +13,7 @@ type ProductFormValues = {
   unit: string;
   price: string;
   taxRate: string;
+  sacCode: string;
 };
 
 const EMPTY_VALUES: ProductFormValues = {
@@ -21,6 +22,7 @@ const EMPTY_VALUES: ProductFormValues = {
   unit: "",
   price: "",
   taxRate: "",
+  sacCode: "",
 };
 
 function Field({
@@ -134,6 +136,7 @@ export function ProductForm({
         <Field label="Unit" name="unit" value={values.unit} onChange={updateField} required placeholder="Project, Hour, Kg…" />
         <Field label="Price" name="price" value={values.price} onChange={updateField} required type="number" placeholder="25000.00" />
         <Field label="Tax %" name="taxRate" value={values.taxRate} onChange={updateField} type="number" placeholder="18.00" />
+        <Field label="SAC Code" name="sacCode" value={values.sacCode} onChange={updateField} placeholder="998314" />
       </div>
       <Field label="Description" name="description" value={values.description} onChange={updateField} textarea />
 

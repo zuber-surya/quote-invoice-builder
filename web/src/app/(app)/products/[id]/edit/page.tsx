@@ -25,6 +25,7 @@ export default async function EditProductPage({ params }: { params: Promise<{ id
             unit: product.unit,
             price: formatDecimal(product.price),
             taxRate: formatDecimal(product.taxRate),
+            sacCode: product.sacCode ?? "",
           }}
         />
       </div>
