@@ -24,6 +24,7 @@ export const documentItemSchema = z.object({
   name: z.string().trim().min(1, "Item name is required").max(200),
   description: optionalString(2000),
   unit: z.string().trim().min(1, "Unit is required").max(50),
+  sacCode: optionalString(50),
   quantity: decimalString({ label: "Quantity", maxDecimalPlaces: 3, min: 0.001 }),
   unitPrice: decimalString({ label: "Unit price", min: 0 }),
   discountAmount: optionalDecimalString({ label: "Discount", min: 0, defaultValue: "0.00" }),

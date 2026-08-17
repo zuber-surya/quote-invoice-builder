@@ -34,6 +34,16 @@ const optionalEmail = z
     message: "Enter a valid email address",
   });
 
+const DATE_PATTERN = /^\d{4}-\d{2}-\d{2}$/;
+const optionalDateString = (label: string) =>
+  z
+    .string()
+    .trim()
+    .regex(DATE_PATTERN, `${label} must be in YYYY-MM-DD format`)
+    .optional()
+    .or(z.literal(""))
+    .transform((value) => (value ? value : null));
+
 export const businessProfileSchema = z.object({
   businessName: z.string().trim().min(1, "Business name is required").max(200),
   logoUrl: optionalUrl(2048),
@@ -53,6 +63,20 @@ export const businessProfileSchema = z.object({
     .toUpperCase()
     .length(3, "Currency must be a 3-letter ISO code")
     .default("INR"),
+
+  bankAccountName: optionalString(150),
+  bankName: optionalString(150),
+  bankAccountNumber: optionalString(50),
+  ifscCode: optionalString(20),
+  swiftBicCode: optionalString(20),
+  lutNumber: optionalString(50),
+  lutDate: optionalDateString("LUT date"),
+
+  pdfShowQuantity: z.boolean().default(true),
+  pdfShowUnitPrice: z.boolean().default(true),
+  pdfShowDiscount: z.boolean().default(true),
+  pdfShowTax: z.boolean().default(true),
+  pdfShowSacCode: z.boolean().default(false),
 });
 
 export type BusinessProfileInput = z.infer<typeof businessProfileSchema>;

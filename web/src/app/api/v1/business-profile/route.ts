@@ -32,11 +32,13 @@ export async function PUT(request: Request) {
     return apiValidationError(parsed.error);
   }
 
+  const data = { ...parsed.data, lutDate: parsed.data.lutDate ? new Date(parsed.data.lutDate) : null };
+
   try {
     const profile = await prisma.businessProfile.upsert({
       where: { userId: user.id },
-      update: parsed.data,
-      create: { ...parsed.data, userId: user.id },
+      update: data,
+      create: { ...data, userId: user.id },
     });
 
     return apiSuccess(profile);
