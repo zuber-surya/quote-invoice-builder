@@ -36,6 +36,7 @@ export default async function EditInvoicePage({ params }: { params: Promise<{ id
               name: item.name,
               description: item.description ?? "",
               unit: item.unit,
+              sacCode: item.sacCode ?? "",
               quantity: formatDecimal(item.quantity, 3),
               unitPrice: formatDecimal(item.unitPrice),
               discountAmount: formatDecimal(item.discountAmount),

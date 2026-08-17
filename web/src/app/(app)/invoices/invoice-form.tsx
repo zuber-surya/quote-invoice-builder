@@ -15,13 +15,22 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 
 type CustomerOption = { id: string; name: string };
-type ProductOption = { id: string; name: string; unit: string; price: string; taxRate: string; description: string | null };
+type ProductOption = {
+  id: string;
+  name: string;
+  unit: string;
+  price: string;
+  taxRate: string;
+  description: string | null;
+  sacCode: string | null;
+};
 
 type InvoiceItemFormValues = {
   productId: string;
   name: string;
   description: string;
   unit: string;
+  sacCode: string;
   quantity: string;
   unitPrice: string;
   discountAmount: string;
@@ -33,6 +42,7 @@ const EMPTY_ITEM: InvoiceItemFormValues = {
   name: "",
   description: "",
   unit: "",
+  sacCode: "",
   quantity: "1",
   unitPrice: "0.00",
   discountAmount: "0.00",
@@ -148,6 +158,7 @@ export function InvoiceForm({
       name: product.name,
       description: product.description ?? "",
       unit: product.unit,
+      sacCode: product.sacCode ?? "",
       unitPrice: product.price,
       taxRate: product.taxRate,
     });
@@ -179,6 +190,7 @@ export function InvoiceForm({
         name: item.name,
         description: item.description,
         unit: item.unit,
+        sacCode: item.sacCode,
         quantity: item.quantity,
         unitPrice: item.unitPrice,
         discountAmount: item.discountAmount,
@@ -317,6 +329,15 @@ export function InvoiceForm({
                       required
                       value={item.unit}
                       onChange={(e) => updateItem(index, { unit: e.target.value })}
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1">
+                    <Label className="text-xs font-medium text-muted-foreground">
+                      SAC Code
+                    </Label>
+                    <Input
+                      value={item.sacCode}
+                      onChange={(e) => updateItem(index, { sacCode: e.target.value })}
                     />
                   </div>
                   <div className="flex flex-col gap-1">
